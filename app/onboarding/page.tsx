@@ -7,36 +7,36 @@ import { cn } from "@/lib/utils";
 import { IcpStep } from "./_components/icp-step";
 import { ImportStep } from "./_components/import-step";
 import { RunningStep } from "./_components/running-step";
+import { GenerateStep } from "./_components/generate-step";
 import { LeadsStep } from "./_components/leads-step";
 
-type Step = "icp" | "import" | "run" | "leads";
+type Step = "icp" | "import" | "run" | "generate" | "leads";
 const STEPS: { key: Step; label: string }[] = [
   { key: "icp", label: "ICP" },
   { key: "import", label: "Import" },
   { key: "run", label: "Détection" },
+  { key: "generate", label: "Séquences" },
   { key: "leads", label: "Leads" },
 ];
 
 export default function OnboardingPage() {
   const [step, setStep] = useState<Step>("icp");
   const [runId, setRunId] = useState<string | null>(null);
-  const [mode, setMode] = useState<Record<string, string> | null>(null);
   const startRun = useStartRun();
 
   const stepIndex = STEPS.findIndex((s) => s.key === step);
 
   const launch = (accounts: AccountInput[]) => {
     startRun.mutate(accounts, {
-      onSuccess: ({ runId, mode }) => {
+      onSuccess: ({ runId }) => {
         setRunId(runId);
-        setMode(mode);
         setStep("run");
       },
     });
   };
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-6 py-10">
+    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-10">
       <header className="mb-10">
         <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
           <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary" /> Sillage GTM
@@ -67,8 +67,9 @@ export default function OnboardingPage() {
           <ImportStep onSubmit={launch} pending={startRun.isPending} />
         )}
         {step === "run" && runId && (
-          <RunningStep runId={runId} mode={mode} onDone={() => setStep("leads")} />
+          <RunningStep runId={runId} onDone={() => setStep("generate")} />
         )}
+        {step === "generate" && <GenerateStep onDone={() => setStep("leads")} />}
         {step === "leads" && runId && <LeadsStep runId={runId} />}
       </main>
     </div>
