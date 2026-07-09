@@ -18,7 +18,7 @@ const LEVEL_COLOR: Record<string, string> = {
 
 function Stat({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: number }) {
   return (
-    <div className="rounded-lg border bg-card p-4">
+    <div className="animate-in rounded-lg border bg-card p-4 shadow-[var(--shadow-sm)]">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
@@ -132,7 +132,7 @@ export function RunningStep({
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3 [&>*:nth-child(2)]:[--i:1] [&>*:nth-child(3)]:[--i:2]">
         <Stat icon={Building2} label="Comptes" value={companies} />
         <Stat icon={Users} label="Décideurs" value={leads} />
         <Stat icon={Mail} label="Contacts trouvés" value={contacts} />

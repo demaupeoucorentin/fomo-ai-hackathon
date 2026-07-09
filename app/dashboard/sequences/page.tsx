@@ -1,6 +1,7 @@
-import Link from "next/link";
-import { Users, Building2, Sparkles } from "lucide-react";
+import { Users, Building2, Sparkles, Layers } from "lucide-react";
 import { container } from "@/adapters/composition/container";
+import { PageHeader } from "../_components/page-header";
+import { EmptyState } from "../_components/wip";
 
 export const dynamic = "force-dynamic";
 
@@ -24,27 +25,27 @@ export default async function SequencesPage() {
   const sequences = await container.getSequences.execute();
 
   return (
-    <div className="max-w-4xl space-y-5">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">Séquences</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Chaque onboarding crée une séquence. De la plus récente à la plus ancienne.
-        </p>
-      </div>
+    <div className="max-w-4xl">
+      <PageHeader
+        title="Séquences"
+        description="Chaque onboarding crée une séquence. De la plus récente à la plus ancienne."
+      />
 
-      {sequences.length === 0 && (
-        <div className="rounded-xl border border-dashed py-16 text-center text-sm text-muted-foreground">
-          Aucune séquence pour l&apos;instant. Lance un{" "}
-          <Link href="/onboarding" className="text-primary underline">
-            onboarding
-          </Link>
-          .
-        </div>
-      )}
-
-      <div className="space-y-3">
-        {sequences.map(({ run, companies, leadCount }) => (
-          <div key={run.id} className="rounded-xl border p-4">
+      {sequences.length === 0 ? (
+        <EmptyState
+          icon={Layers}
+          title="Aucune séquence pour l'instant"
+          description="Lance un onboarding pour détecter des leads et générer une séquence d'emails."
+          action={{ label: "Lancer une détection", href: "/onboarding" }}
+        />
+      ) : (
+        <div className="space-y-3">
+          {sequences.map(({ run, companies, leadCount }, idx) => (
+            <div
+              key={run.id}
+              style={{ "--i": idx } as React.CSSProperties}
+              className="animate-in rounded-xl border bg-card p-4 shadow-[var(--shadow-sm)]"
+            >
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -90,9 +91,10 @@ export default async function SequencesPage() {
                 )}
               </div>
             )}
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

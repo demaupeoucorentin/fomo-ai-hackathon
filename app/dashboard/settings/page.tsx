@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { container } from "@/adapters/composition/container";
+import { PageHeader } from "../_components/page-header";
 import { SeedButton } from "./_components/seed-button";
 
 export const dynamic = "force-dynamic";
@@ -22,19 +23,14 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-4xl space-y-8">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          État des intégrations, usage et facturation.
-        </p>
-      </div>
+      <PageHeader title="Settings" description="État des intégrations, usage et facturation." />
 
       {/* Config sanity */}
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
           Intégrations
         </h2>
-        <div className="divide-y rounded-xl border">
+        <div className="divide-y rounded-xl border bg-card shadow-[var(--shadow-sm)]">
           {PROVIDERS.map((p) => {
             const live = mode[p.key] === "live";
             return (
@@ -74,7 +70,7 @@ export default async function SettingsPage() {
             ["Emails planifiés", stats.emailsScheduled],
             ["Emails envoyés", stats.emailsSent],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-xl border p-4">
+            <div key={label} className="rounded-xl border bg-card p-4 shadow-[var(--shadow-sm)]">
               <div className="text-xs text-muted-foreground">{label}</div>
               <div className="mt-1 text-2xl font-semibold tracking-tight">{value}</div>
             </div>
@@ -92,7 +88,7 @@ export default async function SettingsPage() {
           {PLANS.map((p) => (
             <div
               key={p.name}
-              className={`rounded-xl border p-5 ${p.highlight ? "border-primary ring-1 ring-primary" : ""}`}
+              className={`rounded-xl border bg-card p-5 shadow-[var(--shadow-sm)] ${p.highlight ? "border-primary ring-1 ring-primary" : ""}`}
             >
               <div className="text-sm font-medium">{p.name}</div>
               <div className="mt-1 text-2xl font-semibold tracking-tight">{p.price}</div>
