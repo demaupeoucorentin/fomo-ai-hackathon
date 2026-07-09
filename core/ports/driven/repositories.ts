@@ -22,6 +22,7 @@ export interface RunRepositoryPort {
 export interface CompanyRepositoryPort {
   saveMany(companies: Company[]): Promise<void>;
   listByRun(runId: string): Promise<Company[]>;
+  listAll(): Promise<Company[]>;
   get(id: string): Promise<Company | null>;
 }
 
@@ -29,6 +30,7 @@ export interface LeadRepositoryPort {
   saveMany(leads: Lead[]): Promise<void>;
   update(lead: Lead): Promise<void>;
   listByRun(runId: string): Promise<Lead[]>;
+  listAll(): Promise<Lead[]>;
   get(id: string): Promise<Lead | null>;
 }
 
@@ -36,12 +38,14 @@ export interface SignalRepositoryPort {
   saveMany(signals: Signal[]): Promise<void>;
   listByLead(leadId: string): Promise<Signal[]>;
   listByRun(runId: string): Promise<Signal[]>;
+  listAll(): Promise<Signal[]>;
 }
 
 export interface EmailRepositoryPort {
   saveMany(emails: EmailMessage[]): Promise<void>;
   listByLead(leadId: string): Promise<EmailMessage[]>;
   listByRun(runId: string): Promise<EmailMessage[]>;
+  listAll(): Promise<EmailMessage[]>;
 }
 
 export interface StepLogRepositoryPort {

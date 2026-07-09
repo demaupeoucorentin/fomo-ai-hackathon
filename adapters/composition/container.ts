@@ -5,12 +5,15 @@ import type { Ports } from "../../core/ports/driven";
 import { CreateRun } from "../../core/use-cases/create-run";
 import { GenerateIcp, SavePersona } from "../../core/use-cases/generate-icp";
 import {
+  GetAllLeads,
+  GetHomeStats,
   GetLeadDetail,
   GetLeads,
   GetRunStatus,
   GetSequences,
 } from "../../core/use-cases/queries";
 import { RunPipeline } from "../../core/use-cases/run-pipeline";
+import { SeedDemo } from "../../core/use-cases/seed-demo";
 
 import {
   DrizzleCompanyRepository,
@@ -63,6 +66,8 @@ function buildPorts(): Ports {
 
 function buildContainer() {
   const ports = buildPorts();
+  const createRun = new CreateRun(ports);
+  const runPipeline = new RunPipeline(ports);
   return {
     ports,
     mode: {
@@ -72,12 +77,15 @@ function buildContainer() {
     } as const,
     generateIcp: new GenerateIcp(ports),
     savePersona: new SavePersona(ports),
-    createRun: new CreateRun(ports),
-    runPipeline: new RunPipeline(ports),
+    createRun,
+    runPipeline,
     getRunStatus: new GetRunStatus(ports),
     getLeads: new GetLeads(ports),
+    getAllLeads: new GetAllLeads(ports),
+    getHomeStats: new GetHomeStats(ports),
     getLeadDetail: new GetLeadDetail(ports),
     getSequences: new GetSequences(ports),
+    seedDemo: new SeedDemo({ createRun, runPipeline }),
   };
 }
 
