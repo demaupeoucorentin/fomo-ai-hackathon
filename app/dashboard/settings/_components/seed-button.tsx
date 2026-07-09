@@ -13,11 +13,11 @@ export function SeedButton() {
     setLoading(true);
     try {
       const r = await fetch("/api/seed", { method: "POST" });
-      if (!r.ok) throw new Error(`Seed échoué (${r.status})`);
-      notify("Données de démo chargées", "success");
+      if (!r.ok) throw new Error(`Seed failed (${r.status})`);
+      notify("Demo data loaded", "success");
       router.refresh();
     } catch (e) {
-      notify(e instanceof Error ? e.message : "Erreur seed", "error");
+      notify(e instanceof Error ? e.message : "Seed error", "error");
     } finally {
       setLoading(false);
     }
@@ -26,7 +26,7 @@ export function SeedButton() {
   return (
     <Button onClick={seed} disabled={loading} variant="outline" size="sm">
       {loading ? <Loader2 className="animate-spin" /> : <Database />}
-      Charger des données de démo
+      Load demo data
     </Button>
   );
 }

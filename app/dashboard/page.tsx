@@ -34,16 +34,16 @@ export default async function HomePage() {
     <div className="max-w-4xl">
       <PageHeader
         title="Home"
-        description="Vue d'ensemble de tes séquences et de leur funnel d'emails."
+        description="Overview of your sequences and their email funnel."
       />
 
       {empty ? (
         <div className="rounded-xl border bg-card py-16 text-center text-sm text-muted-foreground shadow-[var(--shadow-sm)]">
-          Rien à afficher. Charge des{" "}
+          Nothing to show yet. Load{" "}
           <Link href="/dashboard/settings" className="text-primary underline">
-            données de démo
+            demo data
           </Link>{" "}
-          depuis les Settings, ou lance un{" "}
+          from Settings, or run an{" "}
           <Link href="/onboarding" className="text-primary underline">
             onboarding
           </Link>
@@ -52,16 +52,16 @@ export default async function HomePage() {
       ) : (
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            <Stat label="Séquences" value={stats.sequences} icon={Layers} />
+            <Stat label="Sequences" value={stats.sequences} icon={Layers} />
             <Stat label="Leads" value={stats.leads} icon={Users} />
-            <Stat label="Emails planifiés" value={stats.emailsScheduled} icon={Mail} />
-            <Stat label="Emails envoyés" value={stats.emailsSent} icon={CheckCircle2} />
-            <Stat label="Contacts trouvés" value={stats.contactsFound} icon={CheckCircle2} />
+            <Stat label="Scheduled emails" value={stats.emailsScheduled} icon={Mail} />
+            <Stat label="Sent emails" value={stats.emailsSent} icon={CheckCircle2} />
+            <Stat label="Contacts found" value={stats.contactsFound} icon={CheckCircle2} />
           </div>
 
           <div className="rounded-xl border bg-card p-5 shadow-[var(--shadow-sm)]">
             <div className="mb-4 flex items-center gap-2 text-sm font-medium">
-              <Radio className="h-4 w-4 text-primary" /> Signaux par type
+              <Radio className="h-4 w-4 text-primary" /> Signals by type
             </div>
             <div className="space-y-2.5">
               {stats.signalsByType.map((s) => {

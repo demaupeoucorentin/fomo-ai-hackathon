@@ -5,19 +5,19 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
-// Fausse génération : on montre 4 tâches Anthropic tourner en séquence pour
-// faire patienter l'utilisateur, puis on passe automatiquement à l'étape Leads.
-// La donnée (leads + emails) a déjà été produite par le run à l'étape précédente.
+// Fake generation: we show 4 Anthropic tasks running in sequence to keep
+// the user engaged, then automatically move to the Leads step.
+// The data (leads + emails) was already produced by the run in the previous step.
 const TASKS = [
-  "Analyse des signaux détectés",
-  "Sélection des angles de comparaison",
-  "Rédaction personnalisée par Anthropic",
-  "Planification de la cadence (J+0, J+7, J+14)",
+  "Analyzing detected signals",
+  "Selecting comparison angles",
+  "Personalized writing by Anthropic",
+  "Scheduling the cadence (Day 0, Day 7, Day 14)",
 ];
 const STEP_MS = 1100;
 
 export function GenerateStep({ onDone }: { onDone: () => void }) {
-  // active = index de la tâche en cours ; TASKS.length = tout est terminé.
+  // active = index of the current task; TASKS.length = everything is done.
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -36,11 +36,11 @@ export function GenerateStep({ onDone }: { onDone: () => void }) {
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
           <Sparkles className="h-6 w-6 text-primary" />
-          Génération des séquences…
+          Generating sequences…
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Anthropic rédige et planifie une séquence de comparateur pour chaque lead, à
-          partir de ton ICP et des signaux détectés.
+          Anthropic writes and schedules a comparator sequence for each lead, based on
+          your ICP and the detected signals.
         </p>
       </div>
 

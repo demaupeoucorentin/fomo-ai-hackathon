@@ -43,9 +43,9 @@ export function ImportStep({
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-28">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Importe tes comptes</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Import your accounts</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Dépose la liste des entreprises que tu veux cibler.
+          Drop the list of companies you want to target.
         </p>
       </div>
 
@@ -82,26 +82,26 @@ export function ImportStep({
           <Upload className="h-6 w-6" />
         </span>
         <div>
-          <div className="font-medium">Dépose ton fichier de sociétés</div>
+          <div className="font-medium">Drop your companies file</div>
           <div className="mt-0.5 text-sm text-muted-foreground">
-            CSV ou Excel — glisse-le ici ou clique pour choisir
+            CSV or Excel — drag it here or click to choose
           </div>
         </div>
         {source === "csv" && (
           <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-600">
-            <Check className="h-4 w-4" /> {accounts.length} sociétés détectées
+            <Check className="h-4 w-4" /> {accounts.length} companies detected
           </p>
         )}
       </div>
 
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
         <div className="h-px flex-1 bg-border" />
-        ou
+        or
         <div className="h-px flex-1 bg-border" />
       </div>
 
       <div className="flex flex-wrap items-center justify-center gap-2">
-        <span className="text-sm text-muted-foreground">Synchronise ton CRM :</span>
+        <span className="text-sm text-muted-foreground">Sync your CRM:</span>
         {["HubSpot", "Salesforce"].map((p) => (
           <Button
             key={p}
@@ -120,7 +120,7 @@ export function ImportStep({
           <CardContent className="p-4">
             <div className="mb-3 flex items-center gap-2 text-sm font-medium">
               <FileSpreadsheet className="h-4 w-4 text-primary" />
-              {accounts.length} comptes prêts
+              {accounts.length} accounts ready
             </div>
             <div className="flex flex-wrap gap-2">
               {accounts.slice(0, 12).map((a, i) => (
@@ -147,7 +147,7 @@ export function ImportStep({
             onClick={() => onSubmit(accounts)}
           >
             {pending ? <Loader2 className="animate-spin" /> : <Sparkles />}
-            Lancer la détection
+            Start detection
           </Button>
         </div>
       )}

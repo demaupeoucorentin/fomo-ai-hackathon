@@ -180,7 +180,7 @@ export class FakeEmailGenerator implements EmailGeneratorPort {
 
 export class FakeSequenceNamer implements SequenceNamerPort {
   async generate() {
-    return "Test Séquence";
+    return "Test Sequence";
   }
 }
 

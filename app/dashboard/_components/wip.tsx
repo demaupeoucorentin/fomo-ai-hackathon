@@ -51,8 +51,8 @@ export function Wip({
       <PageHeader title={title} />
       <EmptyState
         icon={icon}
-        title={note ?? "Bientôt disponible"}
-        description="Cette section arrive prochainement."
+        title={note ?? "Coming soon"}
+        description="This section is coming soon."
         action={action}
       />
     </div>

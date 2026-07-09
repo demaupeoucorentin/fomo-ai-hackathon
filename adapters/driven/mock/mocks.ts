@@ -143,12 +143,12 @@ const MOCK_SIGNALS: SignalRecord[] = [
 
 export class MockSignalProvider implements SignalProviderPort {
   async importAccounts(accounts: AccountInput[], onProgress?: ProgressFn) {
-    onProgress?.(`Résolution de ${accounts.length} comptes…`);
+    onProgress?.(`Resolving ${accounts.length} accounts…`);
     await sleep(500);
     return [ACME, NORTHWIND, GLOBEX, INITECH, UMBRELLA];
   }
   async detectSignals(opts?: { onProgress?: ProgressFn }) {
-    const stages = ["Scan LinkedIn…", "Analyse des concurrents…", "Détection d'intention…"];
+    const stages = ["Scanning LinkedIn…", "Analyzing competitors…", "Detecting intent…"];
     for (const st of stages) {
       opts?.onProgress?.(st);
       await sleep(450);
@@ -161,7 +161,7 @@ export class MockContactEnricher implements ContactEnricherPort {
   async enrich(contacts: EnrichInput[], onProgress?: ProgressFn) {
     const out: Record<string, EnrichResult> = {};
     for (const c of contacts) {
-      onProgress?.(`Enrichissement ${c.firstName} ${c.lastName}…`);
+      onProgress?.(`Enriching ${c.firstName} ${c.lastName}…`);
       await sleep(350);
       out[c.key] = {
         email: `${c.firstName}.${c.lastName}@${c.domain ?? "example.com"}`.toLowerCase(),
@@ -182,7 +182,7 @@ export class MockIcpGenerator implements IcpGeneratorPort {
       headcount: ["51-200", "201-500"],
       industry: ["SaaS", "B2B Software"],
       seniority: ["vp", "director", "c_suite"],
-      additionalInfo: `ICP inféré depuis ${url} : équipes sales B2B en hypercroissance.`,
+      additionalInfo: `ICP inferred from ${url}: hypergrowth B2B sales teams.`,
     };
   }
 }
@@ -192,21 +192,21 @@ export class MockEmailGenerator implements EmailGeneratorPort {
     await sleep(200);
     const name = fullName(ctx.lead).split(" ")[0];
     return {
-      subject: `${ctx.company.name} vs les autres — un comparatif rapide`,
-      body: `Bonjour ${name},\n\nJ'ai vu le signal récent côté ${ctx.company.name}. En regardant objectivement les options du marché, une chose ressort clairement sur la mise en œuvre et le ROI.\n\nJe vous partage un comparatif neutre de 2 min ?\n\n— (${ctx.template.label})`,
+      subject: `${ctx.company.name} vs the rest — a quick comparison`,
+      body: `Hi ${name},\n\nI saw the recent signal on ${ctx.company.name}'s side. Looking objectively at the options on the market, one thing clearly stands out on implementation and ROI.\n\nMind if I share a neutral 2-min comparison?\n\n— (${ctx.template.label})`,
     };
   }
 }
 
 const CODENAMES = [
-  "Horizon Cobalt",
-  "Marée Ambre",
-  "Éclipse Ivoire",
-  "Sillage Écarlate",
-  "Aurore Indigo",
-  "Comète Safran",
-  "Brise Émeraude",
-  "Zénith Onyx",
+  "Cobalt Horizon",
+  "Amber Tide",
+  "Ivory Eclipse",
+  "Scarlet Wake",
+  "Indigo Dawn",
+  "Saffron Comet",
+  "Emerald Breeze",
+  "Onyx Zenith",
 ];
 let nameCounter = 0;
 

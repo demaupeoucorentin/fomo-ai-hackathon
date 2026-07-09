@@ -54,7 +54,7 @@ export class FullEnrichContactEnricher implements ContactEnricherPort {
     const { enrichment_id } = (await start.json()) as { enrichment_id: string };
 
     for (let i = 0; i < 40; i++) {
-      onProgress?.("Recherche email + téléphone…");
+      onProgress?.("Looking up email + phone…");
       const res = await fetch(`${BASE}/contact/enrich/bulk/${enrichment_id}`, {
         headers: { Authorization: `Bearer ${key()}` },
       });

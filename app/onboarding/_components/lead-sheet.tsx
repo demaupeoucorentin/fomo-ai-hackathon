@@ -18,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 
 const fmt = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+  new Date(iso).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 
 export function LeadSheet({
   leadId,
@@ -66,7 +66,7 @@ export function LeadSheet({
               <div className="pt-2">
                 <Button variant="outline" size="sm" asChild>
                   <Link href={`/dashboard/leads/${data.lead.id}`}>
-                    <LayoutDashboard /> Voir dans le dashboard
+                    <LayoutDashboard /> View in dashboard
                   </Link>
                 </Button>
               </div>
@@ -78,7 +78,7 @@ export function LeadSheet({
                   <Activity className="mr-1.5 h-3.5 w-3.5" /> Interactions
                 </TabsTrigger>
                 <TabsTrigger value="sequence">
-                  <CalendarClock className="mr-1.5 h-3.5 w-3.5" /> Séquence
+                  <CalendarClock className="mr-1.5 h-3.5 w-3.5" /> Sequence
                 </TabsTrigger>
               </TabsList>
 
@@ -123,7 +123,7 @@ export function LeadSheet({
                 {openEmail && (
                   <div className="mt-4 rounded-lg border bg-muted/20 p-4">
                     <div className="text-xs text-muted-foreground">
-                      Envoi prévu le {fmt(openEmail.sendDate)}
+                      Scheduled to send on {fmt(openEmail.sendDate)}
                     </div>
                     <div className="mt-1 font-medium">{openEmail.subject}</div>
                     <pre className="mt-3 whitespace-pre-wrap font-sans text-sm leading-relaxed">

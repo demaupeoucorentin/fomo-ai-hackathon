@@ -7,17 +7,17 @@ import { cn } from "@/lib/utils";
 
 // Friendly labels for the email angle (mirrors core/services/templates.ts).
 const TEMPLATE_LABEL: Record<string, string> = {
-  competitor_comparison: "Comparateur concurrent",
-  growth_signal: "Signal de croissance",
-  new_role: "Nouveau poste",
-  hiring: "Recrutement",
-  follow_up: "Relance",
-  breakup: "Dernière relance",
+  competitor_comparison: "Competitor comparison",
+  growth_signal: "Growth signal",
+  new_role: "New role",
+  hiring: "Hiring",
+  follow_up: "Follow-up",
+  breakup: "Last follow-up",
 };
 const templateLabel = (k: string) => TEMPLATE_LABEL[k] ?? k;
 
 const fmt = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+  new Date(iso).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 
 type Item =
   | { kind: "signal"; id: string; date: string; agentType: string; signalType: string }
@@ -58,7 +58,7 @@ export function LeadTimeline({ data }: { data: LeadDetailView }) {
     .sort((a, b) => b.date.localeCompare(a.date));
 
   if (items.length === 0)
-    return <p className="text-sm text-muted-foreground">Aucune activité pour ce lead.</p>;
+    return <p className="text-sm text-muted-foreground">No activity for this lead.</p>;
 
   return (
     <ol className="relative ml-2 border-l pl-6">
@@ -84,7 +84,7 @@ export function LeadTimeline({ data }: { data: LeadDetailView }) {
               >
                 {agentMeta(it.agentType).label}
               </span>
-              <span className="text-sm text-muted-foreground">Signal détecté ({it.signalType})</span>
+              <span className="text-sm text-muted-foreground">Signal detected ({it.signalType})</span>
             </div>
           ) : (
             <div className="mt-1">
@@ -109,11 +109,11 @@ export function LeadTimeline({ data }: { data: LeadDetailView }) {
                 >
                   {it.status === "sent" ? (
                     <>
-                      <CheckCircle2 className="h-3 w-3" /> Envoyé
+                      <CheckCircle2 className="h-3 w-3" /> Sent
                     </>
                   ) : (
                     <>
-                      <Clock className="h-3 w-3" /> Planifié
+                      <Clock className="h-3 w-3" /> Scheduled
                     </>
                   )}
                 </span>

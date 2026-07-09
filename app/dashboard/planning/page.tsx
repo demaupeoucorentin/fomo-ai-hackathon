@@ -10,21 +10,21 @@ export default async function PlanningPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">Planification</h1>
+        <h1 className="text-xl font-semibold tracking-tight">Planning</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Chaque lead, la chaîne signal → email → date qu&apos;on planifie pour lui.
+          Every lead, the signal → email → date chain we plan for them.
         </p>
       </div>
 
       {leads.length === 0 ? (
         <div className="rounded-xl border border-dashed py-16 text-center text-sm text-muted-foreground">
-          Aucun lead pour l&apos;instant. Lance un{" "}
+          No leads yet. Run an{" "}
           <Link href="/onboarding" className="text-primary underline">
             onboarding
           </Link>{" "}
-          ou charge des{" "}
+          or load{" "}
           <Link href="/dashboard/settings" className="text-primary underline">
-            données de démo
+            demo data
           </Link>
           .
         </div>

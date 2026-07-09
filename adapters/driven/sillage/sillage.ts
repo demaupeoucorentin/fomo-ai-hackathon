@@ -118,7 +118,7 @@ const mapSignal = (item: any): SignalRecord => {
 
 export class SillageSignalProvider implements SignalProviderPort {
   async importAccounts(accounts: AccountInput[], onProgress?: ProgressFn) {
-    onProgress?.("Envoi des comptes à Sillage…");
+    onProgress?.("Sending accounts to Sillage…");
     await call("/v2/top-account-list", {
       method: "POST",
       body: JSON.stringify({
@@ -129,7 +129,7 @@ export class SillageSignalProvider implements SignalProviderPort {
     for (let i = 0; i < 20; i++) {
       const st = await call<any>("/v2/top-account-list/status").catch(() => null);
       if (st?.state === "completed" || st?.ingestion_complete) break;
-      onProgress?.("Ingestion des comptes…");
+      onProgress?.("Ingesting accounts…");
       await sleep(1500);
     }
     const res = await call<any>("/v2/top-account-list/accounts");
@@ -147,7 +147,7 @@ export class SillageSignalProvider implements SignalProviderPort {
         agentId = (agents?.data ?? agents ?? [])[0]?.id;
       }
       if (agentId) {
-        onProgress?.("Lancement de la détection…");
+        onProgress?.("Starting detection…");
         const launched = await call<any>("/v2/workspace/signal-runs", {
           method: "POST",
           body: JSON.stringify({ agent_id: agentId }),
@@ -157,7 +157,7 @@ export class SillageSignalProvider implements SignalProviderPort {
           for (let i = 0; i < 30; i++) {
             const st = await call<any>(`/v2/workspace/signal-runs/${id}`).catch(() => null);
             const stage = st?.stage;
-            onProgress?.(stage ? `Détection : ${stage}` : "Détection en cours…");
+            onProgress?.(stage ? `Detection: ${stage}` : "Detection in progress…");
             if (stage === "completed" || stage === "completed_partial" || stage === "failed") break;
             await sleep(2000);
           }
@@ -165,10 +165,10 @@ export class SillageSignalProvider implements SignalProviderPort {
       }
     } catch (e) {
       onProgress?.(
-        `Run de détection indisponible (${e instanceof Error ? e.message : "erreur"}) — lecture des signaux existants`,
+        `Detection run unavailable (${e instanceof Error ? e.message : "error"}) — reading existing signals`,
       );
     }
-    onProgress?.("Récupération des signaux…");
+    onProgress?.("Fetching signals…");
     const res = await call<any>("/v1/workspace/signals?pageSize=100");
     return (res?.data ?? []).map(mapSignal);
   }

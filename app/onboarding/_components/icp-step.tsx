@@ -9,11 +9,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 
 const FIELDS: { key: keyof Persona; label: string }[] = [
-  { key: "jobTitle", label: "Intitulés de poste" },
-  { key: "seniority", label: "Séniorité" },
+  { key: "jobTitle", label: "Job titles" },
+  { key: "seniority", label: "Seniority" },
   { key: "industry", label: "Industries" },
-  { key: "location", label: "Zones" },
-  { key: "headcount", label: "Effectifs" },
+  { key: "location", label: "Regions" },
+  { key: "headcount", label: "Headcount" },
 ];
 
 function IcpSkeleton() {
@@ -21,9 +21,9 @@ function IcpSkeleton() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
-          <Loader2 className="h-4 w-4 animate-spin text-primary" /> On prépare ton client idéal…
+          <Loader2 className="h-4 w-4 animate-spin text-primary" /> Preparing your ideal customer…
         </CardTitle>
-        <CardDescription>On lit ton site et on en déduit ton profil de client idéal.</CardDescription>
+        <CardDescription>We read your site and infer your ideal customer profile.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {FIELDS.map((f) => (
@@ -55,7 +55,7 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
     persona &&
     save.mutate(persona, {
       onSuccess: () => {
-        notify("ICP validé ✓", "success");
+        notify("ICP saved ✓", "success");
         onNext();
       },
     });
@@ -63,9 +63,9 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-28">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Définis ton client idéal</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Define your ideal customer</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Colle l&apos;adresse de ton site, l&apos;IA en déduit ton profil de client idéal.
+          Paste your website address, the AI infers your ideal customer profile.
         </p>
       </div>
 
@@ -75,7 +75,7 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
             <Globe className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-9"
-              placeholder="https://ton-entreprise.com"
+              placeholder="https://your-company.com"
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && website && run()}
@@ -83,7 +83,7 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
           </div>
           <Button onClick={run} disabled={!website || generate.isPending}>
             {generate.isPending ? <Loader2 className="animate-spin" /> : <Sparkles />}
-            Analyser
+            Analyze
           </Button>
         </CardContent>
       </Card>
@@ -93,8 +93,8 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
       {persona && (
         <Card>
           <CardHeader>
-            <CardTitle>Ton client idéal</CardTitle>
-            <CardDescription>Ajuste si besoin — chaque champ est une liste séparée par des virgules.</CardDescription>
+            <CardTitle>Your ideal customer</CardTitle>
+            <CardDescription>Adjust if needed — each field is a comma-separated list.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {FIELDS.map((f) => (
@@ -107,7 +107,7 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
               </div>
             ))}
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-muted-foreground">Contexte</label>
+              <label className="text-xs font-medium text-muted-foreground">Context</label>
               <Input
                 value={persona.additionalInfo ?? ""}
                 onChange={(e) => setPersona((p) => (p ? { ...p, additionalInfo: e.target.value } : p))}
@@ -126,7 +126,7 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
             disabled={save.isPending}
           >
             {save.isPending ? <Loader2 className="animate-spin" /> : null}
-            Valider et continuer
+            Save and continue
             <ArrowRight />
           </Button>
         </div>

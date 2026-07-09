@@ -6,8 +6,8 @@ export default function DashboardEmails() {
     <Wip
       title="Emails"
       icon={Mail}
-      note="Emails générés, planifiés et envoyés"
-      action={{ label: "Lancer une détection", href: "/onboarding" }}
+      note="Generated, scheduled and sent emails"
+      action={{ label: "Start detection", href: "/onboarding" }}
     />
   );
 }

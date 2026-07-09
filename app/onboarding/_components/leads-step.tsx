@@ -35,7 +35,7 @@ export function LeadsStep({ runId }: { runId: string }) {
     () => [
       col.accessor((i) => fullName(i.lead), {
         id: "name",
-        header: "Décideur",
+        header: "Decision-maker",
         cell: (c) => {
           const i = c.row.original;
           return (
@@ -54,7 +54,7 @@ export function LeadsStep({ runId }: { runId: string }) {
       }),
       col.accessor((i) => i.company?.name ?? "", {
         id: "company",
-        header: "Entreprise",
+        header: "Company",
         cell: (c) => {
           const co = c.row.original.company;
           return (
@@ -92,7 +92,7 @@ export function LeadsStep({ runId }: { runId: string }) {
       }),
       col.accessor((i) => i.agentTypes.join(","), {
         id: "signals",
-        header: "Signaux",
+        header: "Signals",
         enableSorting: false,
         cell: (c) => (
           <div className="flex flex-wrap gap-1">
@@ -127,10 +127,10 @@ export function LeadsStep({ runId }: { runId: string }) {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            {data?.leads.length ?? 0} leads détectés
+            {data?.leads.length ?? 0} leads detected
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Ta séquence de comparateur est prête. Clique un lead pour voir sa timeline.
+            Your comparator sequence is ready. Click a lead to view its timeline.
           </p>
         </div>
         <Button variant="outline" asChild>
@@ -143,7 +143,7 @@ export function LeadsStep({ runId }: { runId: string }) {
       <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr]">
         <div className="min-w-0 space-y-4">
           <Input
-            placeholder="Rechercher un lead…"
+            placeholder="Search a lead…"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="max-w-xs"
@@ -171,7 +171,7 @@ export function LeadsStep({ runId }: { runId: string }) {
             {isLoading && (
               <tr>
                 <td colSpan={4} className="px-4 py-10 text-center text-muted-foreground">
-                  Chargement…
+                  Loading…
                 </td>
               </tr>
             )}
