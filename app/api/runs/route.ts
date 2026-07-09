@@ -5,7 +5,7 @@ import type { AccountInput } from "@/core/ports/driven";
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as { accounts?: AccountInput[] };
   const accounts = Array.isArray(body.accounts) ? body.accounts : [];
-  const { runId } = await container.createRun.execute();
+  const { runId } = await container.createRun.execute(accounts);
   // Fire-and-forget: the long-lived dev/start server keeps this promise alive.
   void container.runPipeline
     .execute(runId, accounts)

@@ -2,6 +2,7 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 
 export const runs = sqliteTable("runs", {
   id: text("id").primaryKey(),
+  name: text("name"),
   status: text("status").notNull(),
   signalRequestId: integer("signal_request_id"),
   createdAt: text("created_at").notNull(),

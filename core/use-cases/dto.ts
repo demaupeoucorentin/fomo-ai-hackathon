@@ -29,3 +29,9 @@ export interface LeadDetailView {
   emails: EmailMessage[];
   interactions: Interaction[];
 }
+
+export interface SequenceListItem {
+  run: Run;
+  companies: Company[];
+  leadCount: number;
+}

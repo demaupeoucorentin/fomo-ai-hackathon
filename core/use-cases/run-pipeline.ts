@@ -10,7 +10,7 @@ import type {
 import { fullName, hasContact } from "../domain/entities";
 import { logoFromDomain } from "../domain/value-objects";
 import type { Ports } from "../ports/driven";
-import type { AccountInput, CompanyRecord } from "../ports/driven";
+import type { AccountInput, CompanyRecord, SignalRecord } from "../ports/driven";
 import { dedupLeads, topSignal } from "../services/dedup";
 import { buildSchedule, buildSequence } from "../services/sequencing";
 
@@ -38,35 +38,54 @@ export class RunPipeline {
       await p.runs.setStatus(runId, "running");
       const persona = await p.personaStore.get();
 
-      // Phase 1 — accounts
-      await log("accounts", `📥 Import de ${accounts.length} comptes…`);
-      await p.signalProvider.importAccounts(accounts, (l) => log("accounts", l));
-      await log("accounts", `✅ Comptes ingérés`, "success");
-
-      // Phase 2 — signals (Sillage detection run)
-      await log("signals", `🔍 Détection des signaux…`);
-      const signalRecords = await p.signalProvider.detectSignals({
-        onProgress: (l) => log("signals", l),
+      // A company is stored once, keyed by domain/name. Seeded from the
+      // account-enrichment fallback, then extended with signal companies.
+      const companyByKey = new Map<string, Company>();
+      const toCompany = (cr: CompanyRecord): Company => ({
+        id: p.id.next(),
+        runId,
+        sillageCompanyId: cr.sillageCompanyId,
+        name: cr.name,
+        domain: cr.domain,
+        website: cr.website,
+        logoUrl: cr.logoUrl ?? logoFromDomain(cr.domain),
+        linkedin: cr.linkedin,
       });
+
+      // Phase 1 — accounts (this IS the company-enrichment fallback: the
+      // top-account-list resolves enriched company records we keep regardless
+      // of whether signal detection later succeeds).
+      await log("accounts", `📥 Import de ${accounts.length} comptes…`);
+      const importedCompanies = await p.signalProvider.importAccounts(accounts, (l) =>
+        log("accounts", l),
+      );
+      for (const cr of importedCompanies) {
+        const ck = companyKey(cr);
+        if (!companyByKey.has(ck)) companyByKey.set(ck, toCompany(cr));
+      }
+      await log("accounts", `✅ ${companyByKey.size} sociétés enrichies`, "success");
+
+      // Phase 2 — signals (Sillage detection). Resilient: if detection fails we
+      // keep the enriched companies and continue (fallback), logging the reason.
+      await log("signals", `🔍 Détection des signaux…`);
+      let signalRecords: SignalRecord[] = [];
+      try {
+        signalRecords = await p.signalProvider.detectSignals({
+          onProgress: (l) => log("signals", l),
+        });
+      } catch (e) {
+        await log(
+          "signals",
+          `⚠️ Détection indisponible (${e instanceof Error ? e.message : "erreur"}) — fallback sociétés enrichies`,
+          "warn",
+        );
+      }
       const groups = dedupLeads(signalRecords);
 
-      // Persist companies (deduped)
-      const companyByKey = new Map<string, Company>();
+      // Add companies discovered via signals (deduped against imported ones)
       for (const g of groups) {
         const ck = companyKey(g.lead.company);
-        if (!companyByKey.has(ck)) {
-          const cr = g.lead.company;
-          companyByKey.set(ck, {
-            id: p.id.next(),
-            runId,
-            sillageCompanyId: cr.sillageCompanyId,
-            name: cr.name,
-            domain: cr.domain,
-            website: cr.website,
-            logoUrl: cr.logoUrl ?? logoFromDomain(cr.domain),
-            linkedin: cr.linkedin,
-          });
-        }
+        if (!companyByKey.has(ck)) companyByKey.set(ck, toCompany(g.lead.company));
       }
       await p.companies.saveMany([...companyByKey.values()]);
 

@@ -72,9 +72,17 @@ export function RunningStep({
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: "smooth" });
   }, [logs.length]);
 
+  // Step-by-step notifications: toast each meaningful log once (success = green
+  // milestone, warn/error = detailed reason). Info logs stay in the timeline.
+  const seen = useRef<Set<string>>(new Set());
   useEffect(() => {
-    if (failed) notify(errorLog ?? "Le run a échoué", "error");
-  }, [failed, errorLog]);
+    for (const l of logs) {
+      if (seen.current.has(l.id)) continue;
+      seen.current.add(l.id);
+      if (l.level === "success") notify(l.message, "success");
+      else if (l.level === "error" || l.level === "warn") notify(l.message, "error");
+    }
+  }, [logs]);
 
   const phasesDone = new Set(logs.filter((l) => l.level === "success").map((l) => l.phase)).size;
   const progress = done ? 100 : Math.max(8, (phasesDone / 4) * 100);
@@ -97,6 +105,11 @@ export function RunningStep({
             {failed ? "Détection échouée" : done ? "Détection terminée" : "Détection en cours…"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
+            {data?.run.name ? (
+              <>
+                Séquence <span className="font-medium text-foreground">{data.run.name}</span> ·{" "}
+              </>
+            ) : null}
             Sillage → FullEnrich → Anthropic, en temps réel.
           </p>
           <div className="mt-3">

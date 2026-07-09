@@ -8,6 +8,7 @@ import { HEADCOUNT, SENIORITY } from "../../../core/domain/persona-vocab";
 import type {
   EmailGeneratorPort,
   IcpGeneratorPort,
+  SequenceNamerPort,
 } from "../../../core/ports/driven";
 
 const MODEL = "claude-sonnet-5";
@@ -84,6 +85,33 @@ export class AnthropicIcpGenerator implements IcpGeneratorPort {
       seniority: j.seniority ?? [],
       additionalInfo: j.additionalInfo ?? null,
     };
+  }
+}
+
+export class AnthropicSequenceNamer implements SequenceNamerPort {
+  async generate({ companies }: { companies: string[] }): Promise<string> {
+    const msg = await client().messages.create({
+      model: MODEL,
+      max_tokens: 40,
+      system:
+        "You name sales prospecting sequences with a short, memorable two-word French codename (e.g. 'Horizon Cobalt', 'Marée Ambre'). Reply with ONLY the name, no quotes, no punctuation.",
+      messages: [
+        {
+          role: "user",
+          content: companies.length
+            ? `Companies in this batch: ${companies.slice(0, 8).join(", ")}. Give the codename.`
+            : "Give a random codename.",
+        },
+      ],
+    });
+    const text = msg.content
+      .filter((b): b is Anthropic.TextBlock => b.type === "text")
+      .map((b) => b.text)
+      .join(" ")
+      .trim()
+      .replace(/^["']|["'.]+$/g, "")
+      .split("\n")[0];
+    return text || "Séquence";
   }
 }
 

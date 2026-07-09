@@ -138,27 +138,35 @@ export class SillageSignalProvider implements SignalProviderPort {
 
   async detectSignals(opts?: { agentId?: number; onProgress?: ProgressFn }) {
     const onProgress = opts?.onProgress;
-    let agentId = opts?.agentId;
-    if (!agentId) {
-      const agents = await call<any>("/v2/agents");
-      agentId = (agents?.data ?? agents ?? [])[0]?.id;
-    }
-    if (agentId) {
-      onProgress?.("Lancement de la détection…");
-      const launched = await call<any>("/v2/workspace/signal-runs", {
-        method: "POST",
-        body: JSON.stringify({ agent_id: agentId }),
-      });
-      const ids: number[] = (launched ?? []).map((r: any) => r.signal_request_id).filter(Boolean);
-      for (const id of ids) {
-        for (let i = 0; i < 30; i++) {
-          const st = await call<any>(`/v2/workspace/signal-runs/${id}`).catch(() => null);
-          const stage = st?.stage;
-          onProgress?.(stage ? `Détection : ${stage}` : "Détection en cours…");
-          if (stage === "completed" || stage === "completed_partial" || stage === "failed") break;
-          await sleep(2000);
+    // Launching a fresh detection run is best-effort: if it fails we still read
+    // whatever signals already exist for the workspace.
+    try {
+      let agentId = opts?.agentId;
+      if (!agentId) {
+        const agents = await call<any>("/v2/agents");
+        agentId = (agents?.data ?? agents ?? [])[0]?.id;
+      }
+      if (agentId) {
+        onProgress?.("Lancement de la détection…");
+        const launched = await call<any>("/v2/workspace/signal-runs", {
+          method: "POST",
+          body: JSON.stringify({ agent_id: agentId }),
+        });
+        const ids: number[] = (launched ?? []).map((r: any) => r.signal_request_id).filter(Boolean);
+        for (const id of ids) {
+          for (let i = 0; i < 30; i++) {
+            const st = await call<any>(`/v2/workspace/signal-runs/${id}`).catch(() => null);
+            const stage = st?.stage;
+            onProgress?.(stage ? `Détection : ${stage}` : "Détection en cours…");
+            if (stage === "completed" || stage === "completed_partial" || stage === "failed") break;
+            await sleep(2000);
+          }
         }
       }
+    } catch (e) {
+      onProgress?.(
+        `Run de détection indisponible (${e instanceof Error ? e.message : "erreur"}) — lecture des signaux existants`,
+      );
     }
     onProgress?.("Récupération des signaux…");
     const res = await call<any>("/v1/workspace/signals?pageSize=100");

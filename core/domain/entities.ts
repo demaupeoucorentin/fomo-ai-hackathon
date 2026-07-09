@@ -39,6 +39,7 @@ export interface CrmRefs {
 
 export interface Run {
   id: string;
+  name: string | null; // human codename for the sequence (generated)
   status: RunStatus;
   signalRequestId: number | null;
   createdAt: string; // ISO

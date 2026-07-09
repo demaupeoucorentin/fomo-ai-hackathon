@@ -1,6 +1,11 @@
 import { NotFoundError } from "../domain/errors";
 import type { Ports } from "../ports/driven";
-import type { LeadDetailView, LeadListItem, RunStatusView } from "./dto";
+import type {
+  LeadDetailView,
+  LeadListItem,
+  RunStatusView,
+  SequenceListItem,
+} from "./dto";
 
 export class GetRunStatus {
   constructor(
@@ -19,6 +24,23 @@ export class GetRunStatus {
       this.ports.leads.listByRun(runId),
     ]);
     return { run, stepLogs, companies, leads };
+  }
+}
+
+export class GetSequences {
+  constructor(private readonly ports: Pick<Ports, "runs" | "companies" | "leads">) {}
+
+  async execute(): Promise<SequenceListItem[]> {
+    const runs = await this.ports.runs.list(); // newest first
+    return Promise.all(
+      runs.map(async (run) => {
+        const [companies, leads] = await Promise.all([
+          this.ports.companies.listByRun(run.id),
+          this.ports.leads.listByRun(run.id),
+        ]);
+        return { run, companies, leadCount: leads.length };
+      }),
+    );
   }
 }
 

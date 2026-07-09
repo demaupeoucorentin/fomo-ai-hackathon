@@ -47,6 +47,11 @@ export interface ContactEnricherPort {
   ): Promise<Record<string, EnrichResult>>;
 }
 
+// Anthropic: a short evocative codename for a new sequence (run).
+export interface SequenceNamerPort {
+  generate(context: { companies: string[] }): Promise<string>;
+}
+
 // Anthropic: comparator email from a lead + its triggering signal + a template.
 export interface EmailGeneratorPort {
   write(ctx: EmailTemplateContext & { template: EmailTemplate }): Promise<{

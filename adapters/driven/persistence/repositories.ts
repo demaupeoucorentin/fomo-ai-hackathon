@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import type {
   Company,
   CrmRefs,
@@ -30,16 +30,32 @@ import * as s from "./schema";
 type Row<T> = Record<string, unknown> & T;
 const json = <T>(v: string | null): T | null => (v ? (JSON.parse(v) as T) : null);
 
+const toRun = (r: typeof s.runs.$inferSelect): Run => ({
+  id: r.id,
+  name: r.name,
+  status: r.status as RunStatus,
+  signalRequestId: r.signalRequestId,
+  createdAt: r.createdAt,
+});
+
 export class DrizzleRunRepository implements RunRepositoryPort {
   async create(run: Run) {
     db.insert(s.runs)
-      .values({ id: run.id, status: run.status, signalRequestId: run.signalRequestId, createdAt: run.createdAt })
+      .values({
+        id: run.id,
+        name: run.name,
+        status: run.status,
+        signalRequestId: run.signalRequestId,
+        createdAt: run.createdAt,
+      })
       .run();
   }
   async get(id: string): Promise<Run | null> {
     const r = db.select().from(s.runs).where(eq(s.runs.id, id)).get();
-    if (!r) return null;
-    return { id: r.id, status: r.status as RunStatus, signalRequestId: r.signalRequestId, createdAt: r.createdAt };
+    return r ? toRun(r) : null;
+  }
+  async list(): Promise<Run[]> {
+    return db.select().from(s.runs).orderBy(desc(s.runs.createdAt)).all().map(toRun);
   }
   async setStatus(id: string, status: RunStatus) {
     db.update(s.runs).set({ status }).where(eq(s.runs.id, id)).run();

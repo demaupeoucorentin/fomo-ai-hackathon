@@ -14,6 +14,7 @@ import type {
 export interface RunRepositoryPort {
   create(run: Run): Promise<void>;
   get(id: string): Promise<Run | null>;
+  list(): Promise<Run[]>; // newest first
   setStatus(id: string, status: RunStatus): Promise<void>;
   setSignalRequestId(id: string, signalRequestId: number): Promise<void>;
 }

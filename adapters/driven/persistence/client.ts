@@ -5,7 +5,7 @@ import * as schema from "./schema";
 // ponytail: create tables on boot with idempotent DDL instead of a migration
 // pipeline. Single-process hackathon DB; upgrade to drizzle-kit if the schema churns.
 const DDL = `
-CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, status TEXT NOT NULL, signal_request_id INTEGER, created_at TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, name TEXT, status TEXT NOT NULL, signal_request_id INTEGER, created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS companies (id TEXT PRIMARY KEY, run_id TEXT NOT NULL, sillage_company_id INTEGER, name TEXT NOT NULL, domain TEXT, website TEXT, logo_url TEXT, linkedin TEXT);
 CREATE TABLE IF NOT EXISTS leads (id TEXT PRIMARY KEY, run_id TEXT NOT NULL, company_id TEXT NOT NULL, sillage_lead_id TEXT, first_name TEXT NOT NULL, last_name TEXT NOT NULL, position TEXT, linkedin TEXT, avatar_url TEXT, email TEXT, phone TEXT, enrich_status TEXT NOT NULL, crm TEXT);
 CREATE TABLE IF NOT EXISTS signals (id TEXT PRIMARY KEY, run_id TEXT NOT NULL, lead_id TEXT NOT NULL, signal_type TEXT NOT NULL, agent_type TEXT NOT NULL, signal_date TEXT, data TEXT);
@@ -31,6 +31,12 @@ function build(): Db {
   sqlite.pragma("journal_mode = WAL");
   sqlite.pragma("busy_timeout = 5000");
   sqlite.exec(DDL);
+  // Additive migration for DBs created before `name` existed.
+  try {
+    sqlite.exec("ALTER TABLE runs ADD COLUMN name TEXT");
+  } catch {
+    /* column already exists */
+  }
   return drizzle(sqlite, { schema });
 }
 

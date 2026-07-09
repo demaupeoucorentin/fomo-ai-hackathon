@@ -12,6 +12,7 @@ import type {
   IcpGeneratorPort,
   PersonaStorePort,
   ProgressFn,
+  SequenceNamerPort,
   SignalProviderPort,
   SignalRecord,
 } from "../../../core/ports/driven";
@@ -143,6 +144,26 @@ export class MockEmailGenerator implements EmailGeneratorPort {
       subject: `${ctx.company.name} vs les autres — un comparatif rapide`,
       body: `Bonjour ${name},\n\nJ'ai vu le signal récent côté ${ctx.company.name}. En regardant objectivement les options du marché, une chose ressort clairement sur la mise en œuvre et le ROI.\n\nJe vous partage un comparatif neutre de 2 min ?\n\n— (${ctx.template.label})`,
     };
+  }
+}
+
+const CODENAMES = [
+  "Horizon Cobalt",
+  "Marée Ambre",
+  "Éclipse Ivoire",
+  "Sillage Écarlate",
+  "Aurore Indigo",
+  "Comète Safran",
+  "Brise Émeraude",
+  "Zénith Onyx",
+];
+let nameCounter = 0;
+
+export class MockSequenceNamer implements SequenceNamerPort {
+  async generate(): Promise<string> {
+    const n = CODENAMES[nameCounter % CODENAMES.length];
+    nameCounter += 1;
+    return n;
   }
 }
 

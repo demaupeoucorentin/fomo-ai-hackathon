@@ -4,7 +4,12 @@ import "server-only";
 import type { Ports } from "../../core/ports/driven";
 import { CreateRun } from "../../core/use-cases/create-run";
 import { GenerateIcp, SavePersona } from "../../core/use-cases/generate-icp";
-import { GetLeadDetail, GetLeads, GetRunStatus } from "../../core/use-cases/queries";
+import {
+  GetLeadDetail,
+  GetLeads,
+  GetRunStatus,
+  GetSequences,
+} from "../../core/use-cases/queries";
 import { RunPipeline } from "../../core/use-cases/run-pipeline";
 
 import {
@@ -16,7 +21,11 @@ import {
   DrizzleSignalRepository,
   DrizzleStepLogRepository,
 } from "../driven/persistence/repositories";
-import { AnthropicEmailGenerator, AnthropicIcpGenerator } from "../driven/anthropic/anthropic";
+import {
+  AnthropicEmailGenerator,
+  AnthropicIcpGenerator,
+  AnthropicSequenceNamer,
+} from "../driven/anthropic/anthropic";
 import { FullEnrichContactEnricher } from "../driven/fullenrich/fullenrich";
 import { SillagePersonaStore, SillageSignalProvider } from "../driven/sillage/sillage";
 import {
@@ -24,6 +33,7 @@ import {
   MockEmailGenerator,
   MockIcpGenerator,
   MockPersonaStore,
+  MockSequenceNamer,
   MockSignalProvider,
 } from "../driven/mock/mocks";
 
@@ -38,6 +48,7 @@ function buildPorts(): Ports {
     icpGenerator: hasAnthropic ? new AnthropicIcpGenerator() : new MockIcpGenerator(),
     contactEnricher: hasFullEnrich ? new FullEnrichContactEnricher() : new MockContactEnricher(),
     emailGenerator: hasAnthropic ? new AnthropicEmailGenerator() : new MockEmailGenerator(),
+    sequenceNamer: hasAnthropic ? new AnthropicSequenceNamer() : new MockSequenceNamer(),
     runs: new DrizzleRunRepository(),
     companies: new DrizzleCompanyRepository(),
     leads: new DrizzleLeadRepository(),
@@ -66,6 +77,7 @@ function buildContainer() {
     getRunStatus: new GetRunStatus(ports),
     getLeads: new GetLeads(ports),
     getLeadDetail: new GetLeadDetail(ports),
+    getSequences: new GetSequences(ports),
   };
 }
 

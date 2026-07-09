@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Layers,
   Users,
   Mail,
   Gauge,
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+  { href: "/dashboard/sequences", label: "Séquences", icon: Layers },
   { href: "/dashboard/leads", label: "Leads", icon: Users },
   { href: "/dashboard/emails", label: "Emails", icon: Mail },
   { href: "/dashboard/usage", label: "Usage", icon: Gauge },

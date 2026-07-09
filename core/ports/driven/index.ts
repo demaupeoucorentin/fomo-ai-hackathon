@@ -8,6 +8,7 @@ import type {
   EmailGeneratorPort,
   IcpGeneratorPort,
   PersonaStorePort,
+  SequenceNamerPort,
   SignalProviderPort,
 } from "./providers";
 import type {
@@ -28,6 +29,7 @@ export interface Ports {
   icpGenerator: IcpGeneratorPort;
   contactEnricher: ContactEnricherPort;
   emailGenerator: EmailGeneratorPort;
+  sequenceNamer: SequenceNamerPort;
 
   runs: RunRepositoryPort;
   companies: CompanyRepositoryPort;

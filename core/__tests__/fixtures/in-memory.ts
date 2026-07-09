@@ -22,6 +22,7 @@ import type {
   PersonaStorePort,
   Ports,
   ProgressFn,
+  SequenceNamerPort,
   SignalProviderPort,
   SignalRecord,
 } from "../../ports/driven";
@@ -34,6 +35,9 @@ class InMemoryRuns {
   }
   async get(id: string) {
     return this.items.find((r) => r.id === id) ?? null;
+  }
+  async list() {
+    return [...this.items].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
   async setStatus(id: string, status: RunStatus) {
     const r = this.items.find((x) => x.id === id);
@@ -162,6 +166,12 @@ export class FakeEmailGenerator implements EmailGeneratorPort {
   }
 }
 
+export class FakeSequenceNamer implements SequenceNamerPort {
+  async generate() {
+    return "Test Séquence";
+  }
+}
+
 export class FakeIcpGenerator implements IcpGeneratorPort {
   async fromWebsite(): Promise<Persona> {
     return {
@@ -222,6 +232,7 @@ export const makeFakePorts = (opts?: {
   icpGenerator: new FakeIcpGenerator(),
   contactEnricher: new FakeContactEnricher(),
   emailGenerator: new FakeEmailGenerator(),
+  sequenceNamer: new FakeSequenceNamer(),
   runs: new InMemoryRuns(),
   companies: new InMemoryCompanies(),
   leads: new InMemoryLeads(),
