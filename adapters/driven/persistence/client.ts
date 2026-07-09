@@ -1,9 +1,9 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 
 // ponytail: create tables on boot with idempotent DDL instead of a migration
-// pipeline. Single-process hackathon DB; upgrade to drizzle-kit if the schema churns.
+// pipeline. Single-schema hackathon DB; upgrade to drizzle-kit if the schema churns.
 const DDL = `
 CREATE TABLE IF NOT EXISTS runs (id TEXT PRIMARY KEY, name TEXT, status TEXT NOT NULL, signal_request_id INTEGER, created_at TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS companies (id TEXT PRIMARY KEY, run_id TEXT NOT NULL, sillage_company_id INTEGER, name TEXT NOT NULL, domain TEXT, website TEXT, logo_url TEXT, linkedin TEXT);
@@ -23,34 +23,26 @@ CREATE INDEX IF NOT EXISTS idx_interactions_lead ON interactions(lead_id);
 
 type Db = ReturnType<typeof drizzle<typeof schema>>;
 
-// Singleton across dev hot-reloads.
-const g = globalThis as unknown as { __db?: Db };
+// Singleton promise across serverless-instance reuse and dev hot-reloads.
+const g = globalThis as unknown as { __dbP?: Promise<Db> };
 
-function build(): Db {
-  const sqlite = new Database(process.env.SQLITE_PATH ?? "sqlite.db");
-  sqlite.pragma("journal_mode = WAL");
-  sqlite.pragma("busy_timeout = 5000");
-  sqlite.exec(DDL);
+async function build(): Promise<Db> {
+  // Local dev: a file in the repo root. Prod (Vercel): a Turso/libSQL URL so the
+  // background pipeline and the polling reads share ONE durable, cross-instance DB.
+  const url = process.env.DATABASE_URL ?? "file:sqlite.db";
+  const authToken = process.env.DATABASE_AUTH_TOKEN;
+  const client = createClient({ url, authToken });
+  await client.executeMultiple(DDL);
   // Additive migration for DBs created before `name` existed.
   try {
-    sqlite.exec("ALTER TABLE runs ADD COLUMN name TEXT");
+    await client.execute("ALTER TABLE runs ADD COLUMN name TEXT");
   } catch {
     /* column already exists */
   }
-  return drizzle(sqlite, { schema });
+  return drizzle(client, { schema });
 }
 
-// Lazy: the DB file is only opened on first query, not at import time. This
-// keeps `next build` page-data collection from opening N connections in
-// parallel workers (SQLITE_BUSY).
-function getDb(): Db {
-  return g.__db ?? (g.__db = build());
+// Lazy + async: the connection opens on first use and the DDL runs exactly once.
+export function getDb(): Promise<Db> {
+  return (g.__dbP ??= build());
 }
-
-export const db = new Proxy({} as Db, {
-  get(_t, prop) {
-    const real = getDb() as unknown as Record<string | symbol, unknown>;
-    const v = real[prop];
-    return typeof v === "function" ? (v as (...a: unknown[]) => unknown).bind(real) : v;
-  },
-}) as Db;

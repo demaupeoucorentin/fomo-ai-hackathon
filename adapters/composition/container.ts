@@ -1,5 +1,5 @@
 // Composition root — the ONLY place adapters meet ports. Server-only
-// (imports better-sqlite3). API routes import this; UI never does.
+// (opens the DB connection). API routes import this; UI never does.
 import "server-only";
 import type { Ports } from "../../core/ports/driven";
 import { CreateRun } from "../../core/use-cases/create-run";
