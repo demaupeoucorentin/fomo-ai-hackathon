@@ -70,14 +70,18 @@ function formatSillageError(raw: string, status: number, method: string, path: s
   return `${head}${raw ? ` — ${raw.slice(0, 180)}` : ""}`;
 }
 
-const mapCompany = (c: any): CompanyRecord => ({
-  sillageCompanyId: c?.company_id ?? c?.id ?? null,
-  name: c?.name ?? c?.company?.name ?? "—",
-  domain: c?.domain ?? c?.website_url ?? null,
-  website: c?.website_url ?? (c?.domain ? `https://${c.domain}` : null),
-  logoUrl: c?.logo_url ?? null,
-  linkedin: c?.linkedin_url ?? null,
-});
+// /v2/top-account-list/accounts nests the enriched record under `company`.
+const mapCompany = (c: any): CompanyRecord => {
+  const co = c?.company ?? c;
+  return {
+    sillageCompanyId: c?.company_id ?? c?.id ?? null,
+    name: co?.name ?? "—",
+    domain: co?.domain ?? null,
+    website: co?.domain ? `https://${co.domain}` : null,
+    logoUrl: co?.logo_url ?? null,
+    linkedin: co?.linkedin_url ?? null,
+  };
+};
 
 const mapSignal = (item: any): SignalRecord => {
   const lead = item?.lead ?? {};
@@ -138,30 +142,86 @@ export class SillageSignalProvider implements SignalProviderPort {
 
   async detectSignals(opts?: { agentId?: number; onProgress?: ProgressFn }) {
     const onProgress = opts?.onProgress;
-    // Launching a fresh detection run is best-effort: if it fails we still read
+    // Launching fresh detection runs is best-effort: if it fails we still read
     // whatever signals already exist for the workspace.
     try {
-      let agentId = opts?.agentId;
-      if (!agentId) {
-        const agents = await call<any>("/v2/agents");
-        agentId = (agents?.data ?? agents ?? [])[0]?.id;
-      }
-      if (agentId) {
-        onProgress?.("Starting detection…");
-        const launched = await call<any>("/v2/workspace/signal-runs", {
-          method: "POST",
-          body: JSON.stringify({ agent_id: agentId }),
-        });
-        const ids: number[] = (launched ?? []).map((r: any) => r.signal_request_id).filter(Boolean);
-        for (const id of ids) {
-          for (let i = 0; i < 30; i++) {
-            const st = await call<any>(`/v2/workspace/signal-runs/${id}`).catch(() => null);
-            const stage = st?.stage;
-            onProgress?.(stage ? `Detection: ${stage}` : "Detection in progress…");
-            if (stage === "completed" || stage === "completed_partial" || stage === "failed") break;
-            await sleep(2000);
-          }
+      let agents: any[] = ((await call<any>("/v2/agents"))?.data ?? []).filter(
+        (a: any) => a.enabled && a.type !== "unconfigured",
+      );
+      if (opts?.agentId) {
+        agents = agents.filter((a) => a.id === opts.agentId);
+      } else {
+        // Ensure the two agents an onboarding needs. job_update tracks job
+        // changes (no parameters); keyword_detection is the only type that
+        // yields signals immediately on a fresh workspace — its keywords come
+        // from the ICP (persona.trackingKeywords).
+        if (!agents.some((a) => a.type === "job_update")) {
+          onProgress?.("Creating Job Updates agent…");
+          const created = await call<any>("/v2/agents", {
+            method: "POST",
+            body: JSON.stringify({ name: "Job Updates", type: "job_update" }),
+          });
+          if (created?.data) agents.push(created.data);
         }
+        const { keywords } = unpackInfo(
+          (await call<any>("/v2/persona").catch(() => null))?.data?.additional_info ?? null,
+        );
+        const kw = agents.find((a) => a.type === "keyword_detection");
+        if (keywords.length > 0 && !kw) {
+          onProgress?.("Creating Keyword Detection agent…");
+          const created = await call<any>("/v2/agents", {
+            method: "POST",
+            body: JSON.stringify({
+              name: "ICP Keywords",
+              type: "keyword_detection",
+              parameters: { tracking_keywords: keywords },
+            }),
+          });
+          if (created?.data) agents.push(created.data);
+        } else if (
+          keywords.length > 0 &&
+          kw &&
+          JSON.stringify(kw.parameters?.tracking_keywords ?? []) !== JSON.stringify(keywords)
+        ) {
+          // Same workspace, new onboarding → refresh stale keywords.
+          onProgress?.("Updating Keyword Detection agent…");
+          await call<any>(`/v2/agents/${kw.id}`, {
+            method: "PUT",
+            body: JSON.stringify({ parameters: { tracking_keywords: keywords } }),
+          }).catch(() => null);
+        }
+      }
+      const ids: number[] = [];
+      for (const a of agents) {
+        try {
+          onProgress?.(`Starting detection: ${a.name}…`);
+          const launched = await call<any>("/v2/workspace/signal-runs", {
+            method: "POST",
+            body: JSON.stringify({ agent_id: a.id }),
+          });
+          ids.push(...(launched ?? []).map((r: any) => r.signal_request_id).filter(Boolean));
+        } catch (e) {
+          onProgress?.(
+            `Agent ${a.name}: launch failed (${e instanceof Error ? e.message : "error"})`,
+          );
+        }
+      }
+      // Poll every run to a terminal stage. ponytail: hard 3-min cap, route
+      // maxDuration must cover it; move to a queue if runs get longer.
+      const pending = new Set(ids);
+      for (let i = 0; i < 60 && pending.size > 0; i++) {
+        await sleep(3000);
+        for (const id of [...pending]) {
+          const st = await call<any>(`/v2/workspace/signal-runs/${id}`).catch(() => null);
+          const stage = st?.stage;
+          if (stage === "completed" || stage === "completed_partial" || stage === "failed")
+            pending.delete(id);
+        }
+        onProgress?.(
+          pending.size
+            ? `Detection in progress… (${ids.length - pending.size}/${ids.length} runs done)`
+            : "Detection complete",
+        );
       }
     } catch (e) {
       onProgress?.(
@@ -174,11 +234,31 @@ export class SillageSignalProvider implements SignalProviderPort {
   }
 }
 
+// ponytail: Sillage's persona has no keywords field, so trackingKeywords ride
+// in additional_info as a marked last line. Move to a real field if the API
+// grows one.
+const KEYWORDS_MARK = "\n[tracking_keywords] ";
+export const packInfo = (info: string | null, keywords?: string[]) =>
+  keywords?.length ? `${info ?? ""}${KEYWORDS_MARK}${keywords.join(", ")}` : (info ?? undefined);
+export const unpackInfo = (raw: string | null): { info: string | null; keywords: string[] } => {
+  const i = raw?.indexOf(KEYWORDS_MARK) ?? -1;
+  if (raw == null || i < 0) return { info: raw ?? null, keywords: [] };
+  return {
+    info: raw.slice(0, i) || null,
+    keywords: raw
+      .slice(i + KEYWORDS_MARK.length)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
+  };
+};
+
 export class SillagePersonaStore implements PersonaStorePort {
   async get(): Promise<Persona | null> {
     const res = await call<any>("/v2/persona");
     const d = res?.data;
     if (!d) return null;
+    const { info, keywords } = unpackInfo(d.additional_info ?? null);
     return {
       jobTitle: d.job_title ?? [],
       excludeJobTitle: d.exclude_job_title ?? [],
@@ -186,7 +266,8 @@ export class SillagePersonaStore implements PersonaStorePort {
       headcount: d.headcount ?? [],
       industry: d.industry ?? [],
       seniority: d.seniority ?? [],
-      additionalInfo: d.additional_info ?? null,
+      additionalInfo: info,
+      trackingKeywords: keywords,
     };
   }
   async upsert(input: Persona) {
@@ -200,7 +281,7 @@ export class SillagePersonaStore implements PersonaStorePort {
         headcount: p.headcount,
         industry: p.industry,
         seniority: p.seniority,
-        additional_info: p.additionalInfo ?? undefined,
+        additional_info: packInfo(p.additionalInfo, p.trackingKeywords),
       }),
     });
   }
