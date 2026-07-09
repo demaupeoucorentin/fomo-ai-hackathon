@@ -73,6 +73,9 @@ export class DrizzleCompanyRepository implements CompanyRepositoryPort {
   async listByRun(runId: string): Promise<Company[]> {
     return db.select().from(s.companies).where(eq(s.companies.runId, runId)).all() as Company[];
   }
+  async listAll(): Promise<Company[]> {
+    return db.select().from(s.companies).all() as Company[];
+  }
   async get(id: string): Promise<Company | null> {
     return (db.select().from(s.companies).where(eq(s.companies.id, id)).get() as Company) ?? null;
   }
@@ -95,6 +98,9 @@ export class DrizzleLeadRepository implements LeadRepositoryPort {
   }
   async listByRun(runId: string): Promise<Lead[]> {
     return (db.select().from(s.leads).where(eq(s.leads.runId, runId)).all() as any[]).map(fromLeadRow);
+  }
+  async listAll(): Promise<Lead[]> {
+    return (db.select().from(s.leads).all() as any[]).map(fromLeadRow);
   }
   async get(id: string): Promise<Lead | null> {
     const r = db.select().from(s.leads).where(eq(s.leads.id, id)).get() as any;
@@ -124,6 +130,9 @@ export class DrizzleSignalRepository implements SignalRepositoryPort {
   async listByRun(runId: string): Promise<Signal[]> {
     return (db.select().from(s.signals).where(eq(s.signals.runId, runId)).all() as any[]).map(fromSignalRow);
   }
+  async listAll(): Promise<Signal[]> {
+    return (db.select().from(s.signals).all() as any[]).map(fromSignalRow);
+  }
 }
 
 export class DrizzleEmailRepository implements EmailRepositoryPort {
@@ -137,6 +146,9 @@ export class DrizzleEmailRepository implements EmailRepositoryPort {
     );
   }
   async listByRun(): Promise<EmailMessage[]> {
+    return db.select().from(s.emails).all() as EmailMessage[];
+  }
+  async listAll(): Promise<EmailMessage[]> {
     return db.select().from(s.emails).all() as EmailMessage[];
   }
 }

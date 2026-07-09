@@ -57,6 +57,9 @@ class InMemoryCompanies {
   async listByRun(runId: string) {
     return this.items.filter((c) => c.runId === runId);
   }
+  async listAll() {
+    return [...this.items];
+  }
   async get(id: string) {
     return this.items.find((c) => c.id === id) ?? null;
   }
@@ -74,6 +77,9 @@ class InMemoryLeads {
   async listByRun(runId: string) {
     return this.items.filter((l) => l.runId === runId);
   }
+  async listAll() {
+    return [...this.items];
+  }
   async get(id: string) {
     return this.items.find((l) => l.id === id) ?? null;
   }
@@ -90,6 +96,9 @@ class InMemorySignals {
   async listByRun(runId: string) {
     return this.items.filter((s) => s.runId === runId);
   }
+  async listAll() {
+    return [...this.items];
+  }
 }
 
 class InMemoryEmails {
@@ -102,6 +111,9 @@ class InMemoryEmails {
   }
   async listByRun() {
     return this.items;
+  }
+  async listAll() {
+    return [...this.items];
   }
 }
 

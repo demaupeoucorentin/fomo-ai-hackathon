@@ -31,6 +31,8 @@ const company = (name: string, domain: string): CompanyRecord => ({
 const ACME = company("Acme Analytics", "acme.com");
 const NORTHWIND = company("Northwind", "northwind.io");
 const GLOBEX = company("Globex", "globex.com");
+const INITECH = company("Initech", "initech.com");
+const UMBRELLA = company("Umbrella", "umbrella.co");
 
 const lead = (
   id: string,
@@ -52,13 +54,25 @@ const lead = (
   company: co,
 });
 
+const CAMILLE = lead("s-1", "Camille", "Roche", "VP Sales", ACME);
+const DAVID = lead("s-4", "David", "Klein", "Sales Director", NORTHWIND);
+const NADIA = lead("s-7", "Nadia", "Haddad", "Head of Sales", UMBRELLA);
+
 const MOCK_SIGNALS: SignalRecord[] = [
+  // Camille — two signals (multi-touch: shows the merged timeline nicely)
   {
     signalType: "linkedin_comment",
     agentType: "competitor_activity",
     signalDate: "2026-07-02T09:00:00.000Z",
     data: { interaction: { author: { company_name: "CompetitorX" } } },
-    lead: lead("s-1", "Camille", "Roche", "VP Sales", ACME),
+    lead: CAMILLE,
+  },
+  {
+    signalType: "content_view",
+    agentType: "content_engagement",
+    signalDate: "2026-07-06T09:00:00.000Z",
+    data: { content: { title: "State of Sales Benchmarks 2026" } },
+    lead: CAMILLE,
   },
   {
     signalType: "deep_search",
@@ -74,12 +88,20 @@ const MOCK_SIGNALS: SignalRecord[] = [
     data: { new_position: { role: "CRO" } },
     lead: lead("s-3", "Sofia", "Nkemba", "Chief Revenue Officer", NORTHWIND),
   },
+  // David — two signals
   {
     signalType: "job_posting",
     agentType: "job_posting",
     signalDate: "2026-07-03T09:00:00.000Z",
     data: { posting: { title: "Account Executive" } },
-    lead: lead("s-4", "David", "Klein", "Sales Director", NORTHWIND),
+    lead: DAVID,
+  },
+  {
+    signalType: "keyword_match",
+    agentType: "keyword_detection",
+    signalDate: "2026-07-05T09:00:00.000Z",
+    data: { keyword: "sales enablement" },
+    lead: DAVID,
   },
   {
     signalType: "linkedin_reaction",
@@ -88,13 +110,42 @@ const MOCK_SIGNALS: SignalRecord[] = [
     data: { interaction: { author: { company_name: "RivalCo" } } },
     lead: lead("s-5", "Amara", "Diallo", "Head of Revenue Ops", GLOBEX),
   },
+  {
+    signalType: "influencer_reaction",
+    agentType: "influencer_engagement",
+    signalDate: "2026-07-01T09:00:00.000Z",
+    data: { interaction: { author: { name: "Top Sales Voice" } } },
+    lead: lead("s-6", "Liam", "O'Brien", "VP Marketing", INITECH),
+  },
+  // Nadia — two signals
+  {
+    signalType: "deep_search",
+    agentType: "deep_search",
+    signalDate: "2026-07-04T09:00:00.000Z",
+    data: { title: "Opened new EU office", tag: "expansion" },
+    lead: NADIA,
+  },
+  {
+    signalType: "champion_move",
+    agentType: "champion_tracking",
+    signalDate: "2026-07-06T09:00:00.000Z",
+    data: { champion: { note: "Ex-customer joined as Head of Sales" } },
+    lead: NADIA,
+  },
+  {
+    signalType: "job_posting",
+    agentType: "job_posting",
+    signalDate: "2026-07-02T09:00:00.000Z",
+    data: { posting: { title: "Sales Manager" } },
+    lead: lead("s-8", "Marco", "Rossi", "Sales Manager", GLOBEX),
+  },
 ];
 
 export class MockSignalProvider implements SignalProviderPort {
   async importAccounts(accounts: AccountInput[], onProgress?: ProgressFn) {
     onProgress?.(`Résolution de ${accounts.length} comptes…`);
     await sleep(500);
-    return [ACME, NORTHWIND, GLOBEX];
+    return [ACME, NORTHWIND, GLOBEX, INITECH, UMBRELLA];
   }
   async detectSignals(opts?: { onProgress?: ProgressFn }) {
     const stages = ["Scan LinkedIn…", "Analyse des concurrents…", "Détection d'intention…"];
