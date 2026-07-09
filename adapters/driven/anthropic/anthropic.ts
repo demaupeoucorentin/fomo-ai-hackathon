@@ -72,8 +72,14 @@ export class AnthropicIcpGenerator implements IcpGeneratorPort {
           industry: { type: "array", items: { type: "string" } },
           seniority: { type: "array", items: { type: "string", enum: [...SENIORITY] } },
           additionalInfo: { type: "string" },
+          trackingKeywords: {
+            type: "array",
+            items: { type: "string" },
+            description:
+              "3-6 LinkedIn post topics/phrases the ICP would write or engage about, in the site's language. Used to detect buying-intent posts.",
+          },
         },
-        required: ["jobTitle", "industry", "seniority"],
+        required: ["jobTitle", "industry", "seniority", "trackingKeywords"],
       },
     });
     return {
@@ -84,6 +90,7 @@ export class AnthropicIcpGenerator implements IcpGeneratorPort {
       industry: j.industry ?? [],
       seniority: j.seniority ?? [],
       additionalInfo: j.additionalInfo ?? null,
+      trackingKeywords: j.trackingKeywords ?? [],
     };
   }
 }

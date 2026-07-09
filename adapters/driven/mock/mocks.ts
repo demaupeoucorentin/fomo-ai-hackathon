@@ -183,6 +183,7 @@ export class MockIcpGenerator implements IcpGeneratorPort {
       industry: ["SaaS", "B2B Software"],
       seniority: ["vp", "director", "c_suite"],
       additionalInfo: `ICP inferred from ${url}: hypergrowth B2B sales teams.`,
+      trackingKeywords: ["buying signals", "sales intelligence", "outbound"],
     };
   }
 }

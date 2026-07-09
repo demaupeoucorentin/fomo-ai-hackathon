@@ -3,8 +3,8 @@ import { container } from "@/adapters/composition/container";
 import type { AccountInput } from "@/core/ports/driven";
 
 // Give the background pipeline room to finish after the response is sent.
-// Bump if live-API runs need longer (Vercel Pro/Fluid allows up to 300).
-export const maxDuration = 60;
+// Signal-run polling alone can take ~3 min (Vercel Pro/Fluid allows up to 300).
+export const maxDuration = 300;
 
 // POST { accounts } -> create run, launch pipeline after the response, return runId.
 export async function POST(req: Request) {

@@ -28,6 +28,8 @@ export interface Persona {
   industry: string[];
   seniority: string[];
   additionalInfo: string | null;
+  // LinkedIn topics the ICP posts about — feeds the keyword_detection agent.
+  trackingKeywords?: string[];
 }
 
 export interface CrmRefs {

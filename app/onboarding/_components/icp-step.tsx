@@ -14,6 +14,7 @@ const FIELDS: { key: keyof Persona; label: string }[] = [
   { key: "industry", label: "Industries" },
   { key: "location", label: "Regions" },
   { key: "headcount", label: "Headcount" },
+  { key: "trackingKeywords", label: "Tracking keywords" },
 ];
 
 function IcpSkeleton() {
@@ -101,7 +102,7 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
               <div key={f.key} className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground">{f.label}</label>
                 <Input
-                  value={(persona[f.key] as string[]).join(", ")}
+                  value={((persona[f.key] as string[] | undefined) ?? []).join(", ")}
                   onChange={(e) => setField(f.key, e.target.value)}
                 />
               </div>
