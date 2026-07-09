@@ -1,6 +1,8 @@
 // Sillage adapters (SignalProvider + PersonaStore). Real endpoints per
 // .context/attachments Sillage doc. Base URL from SILLAGE_API_BASE.
 import type { AgentType, Persona } from "../../../core/domain/entities";
+import { ProviderError } from "../../../core/domain/errors";
+import { normalizePersona } from "../../../core/domain/persona-vocab";
 import type {
   AccountInput,
   CompanyRecord,
@@ -30,13 +32,44 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
     },
   });
   if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`Sillage ${res.status} ${init?.method ?? "GET"} ${path} ${body.slice(0, 180)}`);
+    const raw = await res.text().catch(() => "");
+    throw new ProviderError(
+      "sillage",
+      res.status,
+      formatSillageError(raw, res.status, init?.method ?? "GET", path),
+      safeJson(raw),
+    );
   }
   return (res.status === 204 ? undefined : await res.json()) as T;
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+function safeJson(raw: string): unknown {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return raw;
+  }
+}
+
+// Turn a Sillage error body into one readable line (validation fields, error
+// message, or title) so both logs and the UI explain the failure.
+function formatSillageError(raw: string, status: number, method: string, path: string): string {
+  const head = `Sillage ${status} ${method} ${path}`;
+  const body = safeJson(raw) as any;
+  if (body && typeof body === "object") {
+    if (body.errors && typeof body.errors === "object") {
+      const fields = Object.entries(body.errors)
+        .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(", ") : String(v)}`)
+        .join(" · ");
+      return `${head} — ${body.title ?? "Invalid request"}: ${fields}`;
+    }
+    if (body.error?.message) return `${head} — ${body.error.message}`;
+    if (body.title || body.message) return `${head} — ${body.title ?? body.message}`;
+  }
+  return `${head}${raw ? ` — ${raw.slice(0, 180)}` : ""}`;
+}
+
 const mapCompany = (c: any): CompanyRecord => ({
   sillageCompanyId: c?.company_id ?? c?.id ?? null,
   name: c?.name ?? c?.company?.name ?? "—",
@@ -148,7 +181,8 @@ export class SillagePersonaStore implements PersonaStorePort {
       additionalInfo: d.additional_info ?? null,
     };
   }
-  async upsert(p: Persona) {
+  async upsert(input: Persona) {
+    const p = normalizePersona(input); // coerce seniority/headcount to valid enums
     await call("/v2/persona", {
       method: "PUT",
       body: JSON.stringify({

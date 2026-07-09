@@ -8,19 +8,27 @@ import type {
 } from "@/core/use-cases/dto";
 import type { AccountInput } from "@/core/ports/driven";
 
+// Extracts the structured `{ error: { message } }` our routes return.
+async function parseOrThrow<T>(r: Response): Promise<T> {
+  const data = await r.json().catch(() => null);
+  if (!r.ok) {
+    const msg = data?.error?.message ?? `Erreur ${r.status}`;
+    throw new Error(msg);
+  }
+  return data as T;
+}
+
 async function getJSON<T>(url: string): Promise<T> {
-  const r = await fetch(url);
-  if (!r.ok) throw new Error(`${url} → ${r.status}`);
-  return r.json();
+  return parseOrThrow<T>(await fetch(url));
 }
 async function postJSON<T>(url: string, body: unknown, method = "POST"): Promise<T> {
-  const r = await fetch(url, {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!r.ok) throw new Error(`${url} → ${r.status}`);
-  return r.json();
+  return parseOrThrow<T>(
+    await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }),
+  );
 }
 
 export const useGenerateIcp = () =>

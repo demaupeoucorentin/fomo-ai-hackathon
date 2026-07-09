@@ -1,5 +1,6 @@
 // FullEnrich adapter — bulk async enrichment.
 // POST /contact/enrich/bulk -> enrichment_id ; GET .../{id} until FINISHED.
+import { ProviderError } from "../../../core/domain/errors";
 import type {
   ContactEnricherPort,
   EnrichInput,
@@ -9,6 +10,18 @@ import type {
 
 const BASE = "https://app.fullenrich.com/api/v2";
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function fail(res: Response, path: string): Promise<never> {
+  const raw = await res.text().catch(() => "");
+  let msg = raw.slice(0, 180);
+  try {
+    const j = JSON.parse(raw);
+    msg = j.message ?? j.error ?? j.detail ?? msg;
+  } catch {
+    /* keep raw */
+  }
+  throw new ProviderError("fullenrich", res.status, `FullEnrich ${res.status} ${path} — ${msg}`, raw);
+}
 
 function key() {
   const k = process.env.FULLENRICH_API_KEY;
@@ -37,7 +50,7 @@ export class FullEnrichContactEnricher implements ContactEnricherPort {
         })),
       }),
     });
-    if (!start.ok) throw new Error(`FullEnrich start → ${start.status}`);
+    if (!start.ok) await fail(start, "/contact/enrich/bulk");
     const { enrichment_id } = (await start.json()) as { enrichment_id: string };
 
     for (let i = 0; i < 40; i++) {

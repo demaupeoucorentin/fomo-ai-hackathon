@@ -129,7 +129,7 @@ export class MockIcpGenerator implements IcpGeneratorPort {
       location: ["France", "United Kingdom"],
       headcount: ["51-200", "201-500"],
       industry: ["SaaS", "B2B Software"],
-      seniority: ["vp", "director", "c_level"],
+      seniority: ["vp", "director", "c_suite"],
       additionalInfo: `ICP inféré depuis ${url} : équipes sales B2B en hypercroissance.`,
     };
   }

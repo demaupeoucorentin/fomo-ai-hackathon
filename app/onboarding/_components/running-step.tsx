@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { Loader2, CheckCircle2, ArrowRight, Users, Building2, Mail } from "lucide-react";
+import { Loader2, CheckCircle2, ArrowRight, Users, Building2, Mail, AlertCircle } from "lucide-react";
 import { useRunStatus } from "@/lib/query/hooks";
+import { notify } from "@/lib/notify";
 import { PHASE_LABEL } from "@/lib/signal-meta";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -64,10 +65,16 @@ export function RunningStep({
   const logs = data?.stepLogs ?? [];
   const status = data?.run.status ?? "pending";
   const done = status === "done";
+  const failed = status === "error";
+  const errorLog = logs.find((l) => l.level === "error")?.message;
 
   useEffect(() => {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: "smooth" });
   }, [logs.length]);
+
+  useEffect(() => {
+    if (failed) notify(errorLog ?? "Le run a échoué", "error");
+  }, [failed, errorLog]);
 
   const phasesDone = new Set(logs.filter((l) => l.level === "success").map((l) => l.phase)).size;
   const progress = done ? 100 : Math.max(8, (phasesDone / 4) * 100);
@@ -80,12 +87,14 @@ export function RunningStep({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-            {done ? (
+            {failed ? (
+              <AlertCircle className="h-6 w-6 text-rose-600" />
+            ) : done ? (
               <CheckCircle2 className="h-6 w-6 text-emerald-600" />
             ) : (
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             )}
-            {done ? "Détection terminée" : "Détection en cours…"}
+            {failed ? "Détection échouée" : done ? "Détection terminée" : "Détection en cours…"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Sillage → FullEnrich → Anthropic, en temps réel.
@@ -102,6 +111,13 @@ export function RunningStep({
       </div>
 
       <Progress value={progress} />
+
+      {failed && errorLog && (
+        <div className="flex items-start gap-2 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{errorLog}</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-3 gap-3">
         <Stat icon={Building2} label="Comptes" value={companies} />

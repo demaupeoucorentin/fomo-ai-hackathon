@@ -1,4 +1,5 @@
 import { container } from "@/adapters/composition/container";
+import { errorResponse } from "@/lib/api-error";
 
 async function scrapeSite(url: string): Promise<string> {
   try {
@@ -27,16 +28,25 @@ function normalizeUrl(input: string): string {
 // POST { website } -> generate ICP draft (not saved).
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as { website?: string };
-  if (!body.website) return Response.json({ error: "website required" }, { status: 400 });
-  const url = normalizeUrl(body.website);
-  const siteText = await scrapeSite(url);
-  const persona = await container.generateIcp.execute({ url, siteText });
-  return Response.json({ persona });
+  if (!body.website)
+    return Response.json({ error: { code: "validation", message: "website requis" } }, { status: 400 });
+  try {
+    const url = normalizeUrl(body.website);
+    const siteText = await scrapeSite(url);
+    const persona = await container.generateIcp.execute({ url, siteText });
+    return Response.json({ persona });
+  } catch (e) {
+    return errorResponse(e);
+  }
 }
 
 // PUT persona -> validate + save to Sillage.
 export async function PUT(req: Request) {
-  const persona = await req.json();
-  await container.savePersona.execute(persona);
-  return Response.json({ ok: true });
+  try {
+    const persona = await req.json();
+    await container.savePersona.execute(persona);
+    return Response.json({ ok: true });
+  } catch (e) {
+    return errorResponse(e);
+  }
 }

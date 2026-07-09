@@ -3,6 +3,8 @@
 // (far more reliable than asking for JSON in prose and parsing it).
 import Anthropic from "@anthropic-ai/sdk";
 import type { Persona } from "../../../core/domain/entities";
+import { ProviderError } from "../../../core/domain/errors";
+import { HEADCOUNT, SENIORITY } from "../../../core/domain/persona-vocab";
 import type {
   EmailGeneratorPort,
   IcpGeneratorPort,
@@ -24,22 +26,31 @@ async function structured<T>(opts: {
   schema: Record<string, unknown>;
   maxTokens: number;
 }): Promise<T> {
-  const msg = await client().messages.create({
-    model: MODEL,
-    max_tokens: opts.maxTokens,
-    system: opts.system,
-    tools: [
-      {
-        name: opts.toolName,
-        description: "Return the result in this exact structure.",
-        input_schema: opts.schema as Anthropic.Tool.InputSchema,
-      },
-    ],
-    tool_choice: { type: "tool", name: opts.toolName },
-    messages: [{ role: "user", content: opts.prompt }],
-  });
+  let msg: Anthropic.Message;
+  try {
+    msg = await client().messages.create({
+      model: MODEL,
+      max_tokens: opts.maxTokens,
+      system: opts.system,
+      tools: [
+        {
+          name: opts.toolName,
+          description: "Return the result in this exact structure.",
+          input_schema: opts.schema as Anthropic.Tool.InputSchema,
+        },
+      ],
+      tool_choice: { type: "tool", name: opts.toolName },
+      messages: [{ role: "user", content: opts.prompt }],
+    });
+  } catch (e) {
+    if (e instanceof Anthropic.APIError) {
+      throw new ProviderError("anthropic", e.status ?? 500, `Anthropic ${e.status ?? ""} — ${e.message}`, e.error);
+    }
+    throw new ProviderError("anthropic", 500, `Anthropic — ${e instanceof Error ? e.message : String(e)}`);
+  }
   const block = msg.content.find((b) => b.type === "tool_use");
-  if (!block || block.type !== "tool_use") throw new Error("model returned no tool_use");
+  if (!block || block.type !== "tool_use")
+    throw new ProviderError("anthropic", 502, "Anthropic returned no structured output");
   return block.input as T;
 }
 
@@ -56,9 +67,9 @@ export class AnthropicIcpGenerator implements IcpGeneratorPort {
           jobTitle: { type: "array", items: { type: "string" } },
           excludeJobTitle: { type: "array", items: { type: "string" } },
           location: { type: "array", items: { type: "string" } },
-          headcount: { type: "array", items: { type: "string" } },
+          headcount: { type: "array", items: { type: "string", enum: [...HEADCOUNT] } },
           industry: { type: "array", items: { type: "string" } },
-          seniority: { type: "array", items: { type: "string" } },
+          seniority: { type: "array", items: { type: "string", enum: [...SENIORITY] } },
           additionalInfo: { type: "string" },
         },
         required: ["jobTitle", "industry", "seniority"],

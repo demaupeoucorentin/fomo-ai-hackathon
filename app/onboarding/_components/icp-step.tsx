@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import type { Persona } from "@/core/domain/entities";
 import { useGenerateIcp, useSavePersona } from "@/lib/query/hooks";
+import { notify } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,7 +30,14 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
       p ? { ...p, [key]: value.split(",").map((s) => s.trim()).filter(Boolean) } : p,
     );
 
-  const validate = () => persona && save.mutate(persona, { onSuccess: onNext });
+  const validate = () =>
+    persona &&
+    save.mutate(persona, {
+      onSuccess: () => {
+        notify("ICP validé ✓", "success");
+        onNext();
+      },
+    });
 
   return (
     <div className="space-y-6">
