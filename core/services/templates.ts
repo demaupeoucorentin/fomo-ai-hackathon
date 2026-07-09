@@ -24,7 +24,7 @@ const base = (c: EmailTemplateContext, angle: string) =>
 
 export const COMPETITOR_TEMPLATE: EmailTemplate = {
   key: "competitor_comparison",
-  label: "Comparateur concurrent",
+  label: "Competitor comparison",
   agentTypes: ["competitor_activity", "content_engagement", "influencer_engagement"],
   buildPrompt: (c) =>
     base(
@@ -35,7 +35,7 @@ export const COMPETITOR_TEMPLATE: EmailTemplate = {
 
 export const GROWTH_TEMPLATE: EmailTemplate = {
   key: "growth_signal",
-  label: "Signal de croissance",
+  label: "Growth signal",
   agentTypes: ["deep_search"],
   buildPrompt: (c) =>
     base(
@@ -46,7 +46,7 @@ export const GROWTH_TEMPLATE: EmailTemplate = {
 
 export const NEW_ROLE_TEMPLATE: EmailTemplate = {
   key: "new_role",
-  label: "Nouveau poste",
+  label: "New role",
   agentTypes: ["job_update", "champion_tracking"],
   buildPrompt: (c) =>
     base(
@@ -57,7 +57,7 @@ export const NEW_ROLE_TEMPLATE: EmailTemplate = {
 
 export const HIRING_TEMPLATE: EmailTemplate = {
   key: "hiring",
-  label: "Recrutement",
+  label: "Hiring",
   agentTypes: ["job_posting", "keyword_detection"],
   buildPrompt: (c) =>
     base(
@@ -68,7 +68,7 @@ export const HIRING_TEMPLATE: EmailTemplate = {
 
 export const FOLLOW_UP_TEMPLATE: EmailTemplate = {
   key: "follow_up",
-  label: "Relance",
+  label: "Follow-up",
   agentTypes: [],
   buildPrompt: (c) =>
     base(
@@ -79,7 +79,7 @@ export const FOLLOW_UP_TEMPLATE: EmailTemplate = {
 
 export const BREAKUP_TEMPLATE: EmailTemplate = {
   key: "breakup",
-  label: "Dernière relance",
+  label: "Last follow-up",
   agentTypes: [],
   buildPrompt: (c) =>
     base(

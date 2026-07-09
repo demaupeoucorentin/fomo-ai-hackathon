@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { LeadTimeline } from "./lead-timeline";
 
 const fmt = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" });
+  new Date(iso).toLocaleDateString("en-US", { day: "2-digit", month: "short" });
 
 const initials = (i: PlanningLeadItem) =>
   `${i.lead.firstName[0] ?? ""}${i.lead.lastName[0] ?? ""}`;
@@ -55,7 +55,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
       <div className="flex w-80 shrink-0 flex-col rounded-xl border">
         <div className="space-y-2 border-b p-3">
           <Input
-            placeholder="Rechercher un lead…"
+            placeholder="Search a lead…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -65,7 +65,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
               onChange={(e) => setSignal(e.target.value)}
               className="w-1/2 rounded-md border bg-background px-2 py-1.5 text-xs"
             >
-              <option value="">Tous signaux</option>
+              <option value="">All signals</option>
               {signalOptions.map((s) => (
                 <option key={s} value={s}>
                   {agentMeta(s).label}
@@ -77,7 +77,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
               onChange={(e) => setBatch(e.target.value)}
               className="w-1/2 rounded-md border bg-background px-2 py-1.5 text-xs"
             >
-              <option value="">Toutes séquences</option>
+              <option value="">All sequences</option>
               {batchOptions.map((b) => (
                 <option key={b} value={b}>
                   {b}
@@ -89,7 +89,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
 
         <div className="min-h-0 flex-1 overflow-y-auto">
           {filtered.length === 0 && (
-            <p className="p-4 text-sm text-muted-foreground">Aucun lead.</p>
+            <p className="p-4 text-sm text-muted-foreground">No leads.</p>
           )}
           {filtered.map((i) => (
             <button
@@ -125,7 +125,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
                 <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
                   <CalendarClock className="h-3 w-3" />
                   {i.emailCount} email{i.emailCount > 1 ? "s" : ""}
-                  {i.nextSendDate && <> · prochain {fmt(i.nextSendDate)}</>}
+                  {i.nextSendDate && <> · next {fmt(i.nextSendDate)}</>}
                 </div>
               </div>
             </button>
@@ -136,9 +136,9 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
       {/* Right pane — planning */}
       <div className="min-w-0 flex-1 overflow-y-auto rounded-xl border p-6">
         {!selected && (
-          <p className="text-sm text-muted-foreground">Sélectionne un lead à gauche.</p>
+          <p className="text-sm text-muted-foreground">Select a lead on the left.</p>
         )}
-        {selected && isLoading && <p className="text-sm text-muted-foreground">Chargement…</p>}
+        {selected && isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
         {selected && data && (
           <div className="max-w-2xl space-y-6">
             <div className="flex items-center gap-4">
@@ -177,7 +177,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
 
             <div>
               <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                Planification — signaux &amp; emails
+                Planning — signals &amp; emails
               </h3>
               <LeadTimeline data={data} />
             </div>

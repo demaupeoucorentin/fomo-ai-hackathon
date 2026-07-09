@@ -4,6 +4,7 @@ import { Check } from "lucide-react";
 import type { AccountInput } from "@/core/ports/driven";
 import { useStartRun } from "@/lib/query/hooks";
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/lib/brand";
 import { IcpStep } from "./_components/icp-step";
 import { ImportStep } from "./_components/import-step";
 import { RunningStep } from "./_components/running-step";
@@ -14,8 +15,8 @@ type Step = "icp" | "import" | "run" | "generate" | "leads";
 const STEPS: { key: Step; label: string }[] = [
   { key: "icp", label: "ICP" },
   { key: "import", label: "Import" },
-  { key: "run", label: "Détection" },
-  { key: "generate", label: "Séquences" },
+  { key: "run", label: "Detection" },
+  { key: "generate", label: "Sequences" },
   { key: "leads", label: "Leads" },
 ];
 
@@ -39,7 +40,7 @@ export default function OnboardingPage() {
     <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-10">
       <header className="mb-10">
         <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary" /> Sillage GTM
+          <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary" /> {BRAND}
         </div>
         <nav className="mt-6 flex items-center gap-2">
           {STEPS.map((s, i) => (

@@ -3,31 +3,31 @@ import type { ReactNode } from "react";
 import { Mail, Users, Clock, Send } from "lucide-react";
 import type { LeadListItem } from "@/core/use-cases/dto";
 
-// LemList-style : visualise la séquence de comparateur (3 touches déterministes,
-// cf. core/services/sequencing.ts). L'étape 1 est déclinée en variantes d'angle
-// dérivées des signaux réellement détectés sur chaque lead.
+// LemList-style: visualizes the comparator sequence (3 deterministic touches,
+// see core/services/sequencing.ts). Step 1 is broken into angle variants
+// derived from the signals actually detected on each lead.
 const ANGLE_BY_SIGNAL: Record<string, string> = {
-  competitor_activity: "Comparateur concurrent",
-  content_engagement: "Comparateur concurrent",
-  influencer_engagement: "Comparateur concurrent",
-  deep_search: "Signal de croissance",
-  job_update: "Nouveau poste",
-  champion_tracking: "Nouveau poste",
-  job_posting: "Recrutement",
-  keyword_detection: "Recrutement",
+  competitor_activity: "Competitor comparison",
+  content_engagement: "Competitor comparison",
+  influencer_engagement: "Competitor comparison",
+  deep_search: "Growth signal",
+  job_update: "New role",
+  champion_tracking: "New role",
+  job_posting: "Hiring",
+  keyword_detection: "Hiring",
 };
-// Ordre de priorité (identique à ANGLE_TEMPLATES dans templates.ts).
+// Priority order (same as ANGLE_TEMPLATES in templates.ts).
 const ANGLE_PRIORITY = [
-  "Comparateur concurrent",
-  "Signal de croissance",
-  "Nouveau poste",
-  "Recrutement",
+  "Competitor comparison",
+  "Growth signal",
+  "New role",
+  "Hiring",
 ];
 const VARIANT_LETTERS = ["A", "B", "C", "D"];
 
 const pickAngle = (agentTypes: string[]): string => {
   const angles = new Set(agentTypes.map((t) => ANGLE_BY_SIGNAL[t]).filter(Boolean));
-  return ANGLE_PRIORITY.find((a) => angles.has(a)) ?? "Comparateur concurrent";
+  return ANGLE_PRIORITY.find((a) => angles.has(a)) ?? "Competitor comparison";
 };
 
 export function SequencePreview({ leads }: { leads: LeadListItem[] }) {
@@ -47,21 +47,21 @@ export function SequencePreview({ leads }: { leads: LeadListItem[] }) {
   return (
     <div>
       <div className="mb-3">
-        <h2 className="text-sm font-semibold tracking-tight">Séquence d&apos;emails</h2>
+        <h2 className="text-sm font-semibold tracking-tight">Email sequence</h2>
         <p className="text-xs text-muted-foreground">
-          3 touches · {audience} destinataire{audience > 1 ? "s" : ""}
+          3 touches · {audience} recipient{audience > 1 ? "s" : ""}
         </p>
       </div>
 
       <div className="mb-4 flex items-center justify-between rounded-lg border bg-muted/30 px-3 py-2 text-xs">
         <span className="flex items-center gap-1.5 text-muted-foreground">
-          <Send className="h-3.5 w-3.5" /> Expéditeur
+          <Send className="h-3.5 w-3.5" /> Sender
         </span>
-        <span className="font-medium">Programmation par défaut</span>
+        <span className="font-medium">Default schedule</span>
       </div>
 
       <div className="relative space-y-4 border-l pl-5">
-        <Step delay="Envoyer immédiatement" channel="Email" audience={audience}>
+        <Step delay="Send immediately" channel="Email" audience={audience}>
           {variants.map((v, i) => (
             <VariantRow
               key={v.angle}
@@ -72,10 +72,10 @@ export function SequencePreview({ leads }: { leads: LeadListItem[] }) {
             />
           ))}
         </Step>
-        <Step delay="Délai de 7 jours" channel="Email · Relance" audience={audience} scheduled />
+        <Step delay="7-day delay" channel="Email · Follow-up" audience={audience} scheduled />
         <Step
-          delay="Délai de 7 jours"
-          channel="Email · Dernière relance"
+          delay="7-day delay"
+          channel="Email · Last follow-up"
           audience={audience}
           scheduled
         />
@@ -105,7 +105,7 @@ function Step({
         {delay}
         {scheduled && (
           <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-normal">
-            planifié
+            scheduled
           </span>
         )}
       </div>

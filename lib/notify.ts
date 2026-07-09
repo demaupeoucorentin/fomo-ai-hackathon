@@ -25,4 +25,4 @@ export function subscribeToasts(l: Listener) {
 }
 
 export const errMessage = (e: unknown) =>
-  e instanceof Error ? e.message : typeof e === "string" ? e : "Erreur inconnue";
+  e instanceof Error ? e.message : typeof e === "string" ? e : "Unknown error";

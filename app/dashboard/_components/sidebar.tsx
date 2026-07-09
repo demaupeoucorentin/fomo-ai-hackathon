@@ -3,10 +3,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, CalendarClock, Settings, Ghost } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BRAND } from "@/lib/brand";
 
 const NAV = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/dashboard/planning", label: "Planification", icon: CalendarClock },
+  { href: "/dashboard/planning", label: "Planning", icon: CalendarClock },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
@@ -21,7 +22,7 @@ export function Sidebar() {
         <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-[var(--shadow-sm)]">
           <Ghost className="h-3.5 w-3.5" />
         </span>
-        Greyhat
+        {BRAND}
       </Link>
       {NAV.map((n) => {
         const active = n.href === "/dashboard" ? path === n.href : path.startsWith(n.href);

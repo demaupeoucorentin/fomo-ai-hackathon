@@ -6,7 +6,7 @@ import { EmptyState } from "../_components/wip";
 export const dynamic = "force-dynamic";
 
 const fmt = (iso: string) =>
-  new Date(iso).toLocaleString("fr-FR", {
+  new Date(iso).toLocaleString("en-US", {
     day: "2-digit",
     month: "short",
     year: "numeric",
@@ -27,16 +27,16 @@ export default async function SequencesPage() {
   return (
     <div className="max-w-4xl">
       <PageHeader
-        title="Séquences"
-        description="Chaque onboarding crée une séquence. De la plus récente à la plus ancienne."
+        title="Sequences"
+        description="Each onboarding creates a sequence. Newest to oldest."
       />
 
       {sequences.length === 0 ? (
         <EmptyState
           icon={Layers}
-          title="Aucune séquence pour l'instant"
-          description="Lance un onboarding pour détecter des leads et générer une séquence d'emails."
-          action={{ label: "Lancer une détection", href: "/onboarding" }}
+          title="No sequences yet"
+          description="Run an onboarding to detect leads and generate an email sequence."
+          action={{ label: "Start detection", href: "/onboarding" }}
         />
       ) : (
         <div className="space-y-3">
@@ -50,7 +50,7 @@ export default async function SequencesPage() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{run.name ?? "Séquence sans nom"}</span>
+                  <span className="font-medium">{run.name ?? "Untitled sequence"}</span>
                   <span
                     className={`rounded-full border px-2 py-0.5 text-[11px] ${STATUS[run.status] ?? STATUS.pending}`}
                   >

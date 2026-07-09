@@ -12,7 +12,7 @@ import type { AccountInput } from "@/core/ports/driven";
 async function parseOrThrow<T>(r: Response): Promise<T> {
   const data = await r.json().catch(() => null);
   if (!r.ok) {
-    const msg = data?.error?.message ?? `Erreur ${r.status}`;
+    const msg = data?.error?.message ?? `Error ${r.status}`;
     throw new Error(msg);
   }
   return data as T;

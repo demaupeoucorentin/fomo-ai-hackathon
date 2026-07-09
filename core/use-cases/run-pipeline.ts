@@ -55,7 +55,7 @@ export class RunPipeline {
       // Phase 1 — accounts (this IS the company-enrichment fallback: the
       // top-account-list resolves enriched company records we keep regardless
       // of whether signal detection later succeeds).
-      await log("accounts", `📥 Import de ${accounts.length} comptes…`);
+      await log("accounts", `📥 Importing ${accounts.length} accounts…`);
       const importedCompanies = await p.signalProvider.importAccounts(accounts, (l) =>
         log("accounts", l),
       );
@@ -63,11 +63,11 @@ export class RunPipeline {
         const ck = companyKey(cr);
         if (!companyByKey.has(ck)) companyByKey.set(ck, toCompany(cr));
       }
-      await log("accounts", `✅ ${companyByKey.size} sociétés enrichies`, "success");
+      await log("accounts", `✅ ${companyByKey.size} companies enriched`, "success");
 
       // Phase 2 — signals (Sillage detection). Resilient: if detection fails we
       // keep the enriched companies and continue (fallback), logging the reason.
-      await log("signals", `🔍 Détection des signaux…`);
+      await log("signals", `🔍 Detecting signals…`);
       let signalRecords: SignalRecord[] = [];
       try {
         signalRecords = await p.signalProvider.detectSignals({
@@ -76,7 +76,7 @@ export class RunPipeline {
       } catch (e) {
         await log(
           "signals",
-          `⚠️ Détection indisponible (${e instanceof Error ? e.message : "erreur"}) — fallback sociétés enrichies`,
+          `⚠️ Detection unavailable (${e instanceof Error ? e.message : "error"}) — falling back to enriched companies`,
           "warn",
         );
       }
@@ -133,13 +133,13 @@ export class RunPipeline {
       await p.signals.saveMany(signals);
       await log(
         "signals",
-        `✅ ${companyByKey.size} boîtes → ${signals.length} signaux / ${leads.length} décideurs`,
+        `✅ ${companyByKey.size} companies → ${signals.length} signals / ${leads.length} decision-makers`,
         "success",
       );
 
       // Phase 3 — enrichment (FullEnrich) for leads without contact
       if (needEnrich.length > 0) {
-        await log("enrich", `📧 Enrichissement de ${needEnrich.length} contacts…`);
+        await log("enrich", `📧 Enriching ${needEnrich.length} contacts…`);
         const results = await p.contactEnricher.enrich(
           needEnrich.map(({ lead, company }) => ({
             key: lead.id,
@@ -157,7 +157,7 @@ export class RunPipeline {
           lead.phone = r?.phone ?? null;
           lead.enrichStatus = r && (r.email || r.phone) ? "enriched" : "not_found";
           await p.leads.update(lead);
-          await log("enrich", `📧 ${fullName(lead)} — ${lead.email ?? "non trouvé"}`);
+          await log("enrich", `📧 ${fullName(lead)} — ${lead.email ?? "not found"}`);
         }
       }
 
@@ -189,7 +189,7 @@ export class RunPipeline {
             leadId: lead.id,
             date: top.signalDate ?? now.toISOString(),
             type: "signal",
-            note: `Signal détecté : ${top.agentType}`,
+            note: `Signal detected: ${top.agentType}`,
           });
         }
 
@@ -209,11 +209,11 @@ export class RunPipeline {
             // One email failing must not kill the whole run — degrade gracefully.
             await log(
               "emails",
-              `⚠️ ${fullName(lead)} (${step.template.key}) : génération échouée, fallback`,
+              `⚠️ ${fullName(lead)} (${step.template.key}): generation failed, fallback`,
               "warn",
             );
             subject = `${company.name} — ${step.template.label}`;
-            body = `Brouillon indisponible (${e instanceof Error ? e.message : "erreur"}). À régénérer.`;
+            body = `Draft unavailable (${e instanceof Error ? e.message : "error"}). To be regenerated.`;
           }
           emails.push({
             id: p.id.next(),
@@ -233,17 +233,17 @@ export class RunPipeline {
             note: `${step.template.label} — ${subject}`,
           });
         }
-        await log("emails", `✍️ ${fullName(lead)} — ${scheduled.length} mails planifiés`);
+        await log("emails", `✍️ ${fullName(lead)} — ${scheduled.length} emails scheduled`);
       }
       await p.emails.saveMany(emails);
       await p.interactions.saveMany(interactions);
 
-      await log("emails", `🎯 ${emails.length} emails générés`, "success");
+      await log("emails", `🎯 ${emails.length} emails generated`, "success");
       await p.runs.setStatus(runId, "done");
     } catch (err) {
       await log(
         "emails",
-        `❌ Erreur pipeline : ${err instanceof Error ? err.message : String(err)}`,
+        `❌ Pipeline error: ${err instanceof Error ? err.message : String(err)}`,
         "error",
       );
       await p.runs.setStatus(runId, "error");

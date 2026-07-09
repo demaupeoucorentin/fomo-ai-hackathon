@@ -7,7 +7,7 @@ import { PageHeader } from "../../_components/page-header";
 export const dynamic = "force-dynamic";
 
 const fmt = (iso: string) =>
-  new Date(iso).toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "numeric" });
+  new Date(iso).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 
 export default async function LeadDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -31,7 +31,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
 
       <section>
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-          Séquence d&apos;emails
+          Email sequence
         </h2>
         <div className="space-y-3">
           {data.emails.map((em) => (

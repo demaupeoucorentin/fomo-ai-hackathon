@@ -17,7 +17,7 @@ export function errorResponse(e: unknown): Response {
       { status },
     );
   }
-  const message = e instanceof Error ? e.message : "Erreur interne";
+  const message = e instanceof Error ? e.message : "Internal error";
   console.error("Unhandled route error:", e);
   return Response.json({ error: { code: "internal", message } }, { status: 500 });
 }

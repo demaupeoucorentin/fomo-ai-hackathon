@@ -6,8 +6,8 @@ export default function DashboardLeads() {
     <Wip
       title="Leads"
       icon={Users}
-      note="Table persistante de tous les leads"
-      action={{ label: "Lancer une détection", href: "/onboarding" }}
+      note="Persistent table of all leads"
+      action={{ label: "Start detection", href: "/onboarding" }}
     />
   );
 }

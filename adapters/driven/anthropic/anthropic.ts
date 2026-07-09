@@ -94,7 +94,7 @@ export class AnthropicSequenceNamer implements SequenceNamerPort {
       model: MODEL,
       max_tokens: 40,
       system:
-        "You name sales prospecting sequences with a short, memorable two-word French codename (e.g. 'Horizon Cobalt', 'Marée Ambre'). Reply with ONLY the name, no quotes, no punctuation.",
+        "You name sales prospecting sequences with a short, memorable two-word English codename (e.g. 'Cobalt Horizon', 'Amber Tide'). Reply with ONLY the name, no quotes, no punctuation.",
       messages: [
         {
           role: "user",
@@ -111,7 +111,7 @@ export class AnthropicSequenceNamer implements SequenceNamerPort {
       .trim()
       .replace(/^["']|["'.]+$/g, "")
       .split("\n")[0];
-    return text || "Séquence";
+    return text || "Sequence";
   }
 }
 
