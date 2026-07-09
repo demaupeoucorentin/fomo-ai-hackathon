@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Users, Mail, CheckCircle2, Layers, Radio } from "lucide-react";
 import { container } from "@/adapters/composition/container";
 import { agentMeta } from "@/lib/signal-meta";
+import { PageHeader } from "./_components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ function Stat({
   icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className="rounded-xl border p-4">
+    <div className="rounded-xl border bg-card p-4 shadow-[var(--shadow-sm)]">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
@@ -30,16 +31,14 @@ export default async function HomePage() {
   const empty = stats.leads === 0;
 
   return (
-    <div className="max-w-4xl space-y-6">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">Home</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Vue d&apos;ensemble de tes séquences et de leur funnel d&apos;emails.
-        </p>
-      </div>
+    <div className="max-w-4xl">
+      <PageHeader
+        title="Home"
+        description="Vue d'ensemble de tes séquences et de leur funnel d'emails."
+      />
 
       {empty ? (
-        <div className="rounded-xl border border-dashed py-16 text-center text-sm text-muted-foreground">
+        <div className="rounded-xl border bg-card py-16 text-center text-sm text-muted-foreground shadow-[var(--shadow-sm)]">
           Rien à afficher. Charge des{" "}
           <Link href="/dashboard/settings" className="text-primary underline">
             données de démo
@@ -51,7 +50,7 @@ export default async function HomePage() {
           .
         </div>
       ) : (
-        <>
+        <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
             <Stat label="Séquences" value={stats.sequences} icon={Layers} />
             <Stat label="Leads" value={stats.leads} icon={Users} />
@@ -60,7 +59,7 @@ export default async function HomePage() {
             <Stat label="Contacts trouvés" value={stats.contactsFound} icon={CheckCircle2} />
           </div>
 
-          <div className="rounded-xl border p-5">
+          <div className="rounded-xl border bg-card p-5 shadow-[var(--shadow-sm)]">
             <div className="mb-4 flex items-center gap-2 text-sm font-medium">
               <Radio className="h-4 w-4 text-primary" /> Signaux par type
             </div>
@@ -86,7 +85,7 @@ export default async function HomePage() {
               })}
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

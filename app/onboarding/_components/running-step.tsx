@@ -1,24 +1,23 @@
 "use client";
-import { useEffect, useRef } from "react";
-import { Loader2, CheckCircle2, ArrowRight, Users, Building2, Mail, AlertCircle } from "lucide-react";
+import { useEffect } from "react";
+import { Loader2, CheckCircle2, Users, Building2, Mail, AlertCircle, Circle, Check } from "lucide-react";
 import { useRunStatus } from "@/lib/query/hooks";
-import { notify } from "@/lib/notify";
-import { PHASE_LABEL } from "@/lib/signal-meta";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
-const LEVEL_COLOR: Record<string, string> = {
-  success: "text-emerald-600",
-  warn: "text-amber-600",
-  error: "text-rose-600",
-  info: "text-muted-foreground",
-};
+// Étapes en langage clair (aucun jargon fournisseur). Mappées sur les phases
+// techniques du pipeline via `key`.
+const PHASES = [
+  { key: "accounts", label: "Analyse de tes comptes" },
+  { key: "signals", label: "Détection des signaux d'achat" },
+  { key: "enrich", label: "Enrichissement des contacts" },
+  { key: "emails", label: "Rédaction des séquences d'emails" },
+];
 
 function Stat({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: number }) {
   return (
-    <div className="rounded-lg border bg-card p-4">
+    <div className="animate-in rounded-lg border bg-card p-4 shadow-[var(--shadow-sm)]">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
@@ -27,40 +26,8 @@ function Stat({ icon: Icon, label, value }: { icon: typeof Users; label: string;
   );
 }
 
-function ModeBadges({ mode }: { mode: Record<string, string> | null }) {
-  if (!mode) return null;
-  const labels: Record<string, string> = { sillage: "Sillage", fullenrich: "FullEnrich", anthropic: "Anthropic" };
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {Object.entries(mode).map(([k, v]) => (
-        <span
-          key={k}
-          className={cn(
-            "inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium",
-            v === "live"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-              : "border-zinc-200 bg-zinc-100 text-zinc-500",
-          )}
-        >
-          <span className={cn("h-1.5 w-1.5 rounded-full", v === "live" ? "bg-emerald-500" : "bg-zinc-400")} />
-          {labels[k] ?? k} · {v === "live" ? "réel" : "mock"}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-export function RunningStep({
-  runId,
-  mode,
-  onDone,
-}: {
-  runId: string;
-  mode: Record<string, string> | null;
-  onDone: () => void;
-}) {
+export function RunningStep({ runId, onDone }: { runId: string; onDone: () => void }) {
   const { data } = useRunStatus(runId);
-  const logRef = useRef<HTMLDivElement>(null);
 
   const logs = data?.stepLogs ?? [];
   const status = data?.run.status ?? "pending";
@@ -68,59 +35,39 @@ export function RunningStep({
   const failed = status === "error";
   const errorLog = logs.find((l) => l.level === "error")?.message;
 
+  // Auto-avance vers la génération des séquences dès que la détection est finie
+  // (pas de bouton). ~900ms pour que l'utilisateur voie "terminée".
   useEffect(() => {
-    logRef.current?.scrollTo({ top: logRef.current.scrollHeight, behavior: "smooth" });
-  }, [logs.length]);
+    if (status !== "done") return;
+    const t = setTimeout(onDone, 900);
+    return () => clearTimeout(t);
+  }, [status, onDone]);
 
-  // Step-by-step notifications: toast each meaningful log once (success = green
-  // milestone, warn/error = detailed reason). Info logs stay in the timeline.
-  const seen = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    for (const l of logs) {
-      if (seen.current.has(l.id)) continue;
-      seen.current.add(l.id);
-      if (l.level === "success") notify(l.message, "success");
-      else if (l.level === "error" || l.level === "warn") notify(l.message, "error");
-    }
-  }, [logs]);
+  const donePhases = new Set<string>(logs.filter((l) => l.level === "success").map((l) => l.phase));
+  // Phase en cours = première non terminée (tant que le run n'est ni fini ni en erreur).
+  const currentIndex = done ? PHASES.length : PHASES.findIndex((p) => !donePhases.has(p.key));
+  const progress = done ? 100 : Math.max(10, (donePhases.size / PHASES.length) * 100);
 
-  const phasesDone = new Set(logs.filter((l) => l.level === "success").map((l) => l.phase)).size;
-  const progress = done ? 100 : Math.max(8, (phasesDone / 4) * 100);
   const companies = data?.companies.length ?? 0;
   const leads = data?.leads.length ?? 0;
   const contacts = data?.leads.filter((l) => l.email).length ?? 0;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-            {failed ? (
-              <AlertCircle className="h-6 w-6 text-rose-600" />
-            ) : done ? (
-              <CheckCircle2 className="h-6 w-6 text-emerald-600" />
-            ) : (
-              <Loader2 className="h-6 w-6 animate-spin text-primary" />
-            )}
-            {failed ? "Détection échouée" : done ? "Détection terminée" : "Détection en cours…"}
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {data?.run.name ? (
-              <>
-                Séquence <span className="font-medium text-foreground">{data.run.name}</span> ·{" "}
-              </>
-            ) : null}
-            Sillage → FullEnrich → Anthropic, en temps réel.
-          </p>
-          <div className="mt-3">
-            <ModeBadges mode={mode} />
-          </div>
-        </div>
-        {done && (
-          <Button size="lg" onClick={onDone}>
-            Voir les {leads} leads <ArrowRight />
-          </Button>
-        )}
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div>
+        <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+          {failed ? (
+            <AlertCircle className="h-6 w-6 text-rose-600" />
+          ) : done ? (
+            <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+          ) : (
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          )}
+          {failed ? "Un souci est survenu" : done ? "C'est prêt !" : "On cherche tes prospects…"}
+        </h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          On analyse tes comptes pour trouver les bons décideurs et préparer leurs emails.
+        </p>
       </div>
 
       <Progress value={progress} />
@@ -132,27 +79,46 @@ export function RunningStep({
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-3">
+      <Card>
+        <CardContent className="space-y-1 p-2">
+          {PHASES.map((phase, i) => {
+            const isDone = done || donePhases.has(phase.key);
+            const running = !isDone && !failed && i === currentIndex;
+            return (
+              <div
+                key={phase.key}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                  running && "bg-accent/50",
+                )}
+              >
+                {isDone ? (
+                  <Check className="h-4 w-4 text-emerald-600" />
+                ) : running ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                ) : (
+                  <Circle className="h-4 w-4 text-muted-foreground/40" />
+                )}
+                <span
+                  className={cn(
+                    isDone && "text-muted-foreground",
+                    running && "font-medium",
+                    !isDone && !running && "text-muted-foreground/60",
+                  )}
+                >
+                  {phase.label}
+                </span>
+              </div>
+            );
+          })}
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-3 gap-3 [&>*:nth-child(2)]:[--i:1] [&>*:nth-child(3)]:[--i:2]">
         <Stat icon={Building2} label="Comptes" value={companies} />
         <Stat icon={Users} label="Décideurs" value={leads} />
         <Stat icon={Mail} label="Contacts trouvés" value={contacts} />
       </div>
-
-      <Card>
-        <CardContent className="p-0">
-          <div ref={logRef} className="max-h-80 overflow-y-auto p-4 font-mono text-xs">
-            {logs.length === 0 && <p className="text-muted-foreground">Initialisation…</p>}
-            {logs.map((l) => (
-              <div key={l.id} className="flex items-baseline gap-2 py-0.5">
-                <span className="w-24 shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                  {PHASE_LABEL[l.phase] ?? l.phase}
-                </span>
-                <span className={cn(LEVEL_COLOR[l.level])}>{l.message}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

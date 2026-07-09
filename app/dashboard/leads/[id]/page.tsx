@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { container } from "@/adapters/composition/container";
 import { NotFoundError } from "@/core/domain/errors";
+import { PageHeader } from "../../_components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -23,14 +24,10 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
       <Link href="/dashboard/leads" className="text-sm text-muted-foreground hover:underline">
         ← Leads
       </Link>
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {data.lead.firstName} {data.lead.lastName}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {data.lead.position} · {data.company?.name} · {data.lead.email ?? "—"} · {data.lead.phone ?? "—"}
-        </p>
-      </div>
+      <PageHeader
+        title={`${data.lead.firstName} ${data.lead.lastName}`}
+        description={`${data.lead.position} · ${data.company?.name} · ${data.lead.email ?? "—"} · ${data.lead.phone ?? "—"}`}
+      />
 
       <section>
         <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">

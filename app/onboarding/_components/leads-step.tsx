@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { LeadSheet } from "./lead-sheet";
+import { SequencePreview } from "./sequence-preview";
 
 const col = createColumnHelper<LeadListItem>();
 const initials = (i: LeadListItem) => `${i.lead.firstName[0] ?? ""}${i.lead.lastName[0] ?? ""}`;
@@ -129,7 +130,7 @@ export function LeadsStep({ runId }: { runId: string }) {
             {data?.leads.length ?? 0} leads détectés
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Clique un lead pour voir sa timeline et sa séquence d&apos;emails.
+            Ta séquence de comparateur est prête. Clique un lead pour voir sa timeline.
           </p>
         </div>
         <Button variant="outline" asChild>
@@ -139,15 +140,17 @@ export function LeadsStep({ runId }: { runId: string }) {
         </Button>
       </div>
 
-      <Input
-        placeholder="Rechercher un lead…"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        className="max-w-xs"
-      />
+      <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr]">
+        <div className="min-w-0 space-y-4">
+          <Input
+            placeholder="Rechercher un lead…"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="max-w-xs"
+          />
 
-      <div className="overflow-hidden rounded-xl border">
-        <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
           <thead className="border-b bg-muted/40">
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id}>
@@ -185,8 +188,14 @@ export function LeadsStep({ runId }: { runId: string }) {
                 ))}
               </tr>
             ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+          </div>
+        </div>
+
+        <div className="h-fit lg:sticky lg:top-6">
+          <SequencePreview leads={data?.leads ?? []} />
+        </div>
       </div>
 
       <LeadSheet leadId={openLead} onOpenChange={(o) => !o && setOpenLead(null)} />

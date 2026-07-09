@@ -15,13 +15,17 @@
   --secondary: #f4f4f5;
   --secondary-foreground: #18181b;
   --muted: #f4f4f5;
-  --muted-foreground: #71717a;
+  --muted-foreground: #64646e; /* un cran plus foncé que zinc-500 pour la lisibilité v0 */
   --accent: #eef2ff;
   --accent-foreground: #3730a3;
   --destructive: #ef4444;
-  --border: #e4e4e7;
+  --border: #e8e8ec; /* bordure plus douce */
   --input: #e4e4e7;
   --ring: #a5b4fc;
+  --sidebar: #fafafa; /* off-white pour séparer la nav du contenu */
+  /* ombres ambiantes douces (style v0) */
+  --shadow-sm: 0 1px 2px 0 rgb(9 9 11 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(9 9 11 / 0.07), 0 1px 2px -1px rgb(9 9 11 / 0.05);
 }
 
 @theme inline {
@@ -60,4 +64,28 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Entrée douce — remplace la couche GSAP par du CSS pur.
+   Utiliser .animate-in, et --i pour décaler une liste (style={{ "--i": n }}). */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-in {
+  animation: fade-up 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-in {
+    animation: none;
+  }
 }
