@@ -29,7 +29,10 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
       ...(init?.headers ?? {}),
     },
   });
-  if (!res.ok) throw new Error(`Sillage ${path} → ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Sillage ${res.status} ${init?.method ?? "GET"} ${path} ${body.slice(0, 180)}`);
+  }
   return (res.status === 204 ? undefined : await res.json()) as T;
 }
 
