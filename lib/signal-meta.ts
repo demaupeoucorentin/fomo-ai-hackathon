@@ -1,13 +1,13 @@
 // Client-safe presentation metadata for signal/agent types.
 export const AGENT_META: Record<string, { label: string; className: string }> = {
-  competitor_activity: { label: "Competitor", className: "bg-rose-50 text-rose-700 border-rose-200" },
+  competitor_activity: { label: "Competitor", className: "bg-orange-50 text-orange-700 border-orange-200" },
   deep_search: { label: "Growth", className: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   job_update: { label: "New role", className: "bg-blue-50 text-blue-700 border-blue-200" },
   job_posting: { label: "Hiring", className: "bg-amber-50 text-amber-700 border-amber-200" },
   content_engagement: { label: "Engagement", className: "bg-violet-50 text-violet-700 border-violet-200" },
   influencer_engagement: { label: "Influencer", className: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200" },
-  keyword_detection: { label: "Keyword", className: "bg-cyan-50 text-cyan-700 border-cyan-200" },
-  champion_tracking: { label: "Champion", className: "bg-indigo-50 text-indigo-700 border-indigo-200" },
+  keyword_detection: { label: "Keyword", className: "bg-sky-50 text-sky-700 border-sky-200" },
+  champion_tracking: { label: "Champion", className: "bg-yellow-50 text-yellow-800 border-yellow-200" },
 };
 
 export const agentMeta = (t: string) =>

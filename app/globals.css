@@ -4,28 +4,64 @@
 
 :root {
   --radius: 0.65rem;
+  /* Palette FOMO — calée sur la landing Framer de référence.
+     Off-white / encre / orange, cartes sombres à accents (voir DESIGN.md). */
   --background: #ffffff;
-  --foreground: #09090b;
+  --foreground: #131515; /* encre near-black (réf) */
   --card: #ffffff;
-  --card-foreground: #09090b;
+  --card-foreground: #131515;
   --popover: #ffffff;
-  --popover-foreground: #09090b;
-  --primary: #4f46e5;
-  --primary-foreground: #fafafa;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #64646e; /* un cran plus foncé que zinc-500 pour la lisibilité v0 */
-  --accent: #eef2ff;
-  --accent-foreground: #3730a3;
+  --popover-foreground: #131515;
+  --primary: #ff4c00; /* orange FOMO (réf) */
+  --primary-foreground: #ffffff;
+  --secondary: #f2f2f2;
+  --secondary-foreground: #131515;
+  --muted: #f2f2f2;
+  --muted-foreground: #494d4d; /* gris de la réf, lisible */
+  --accent: #fff0e9; /* teinte orange douce */
+  --accent-foreground: #b8360a;
   --destructive: #ef4444;
-  --border: #e8e8ec; /* bordure plus douce */
-  --input: #e4e4e7;
-  --ring: #a5b4fc;
-  --sidebar: #fafafa; /* off-white pour séparer la nav du contenu */
+  --border: #e8e8e8; /* hairline de la réf */
+  --input: #e4e4e4;
+  --ring: #ffb020; /* focus jaune/or */
+  --sidebar: #f7f7f7;
+  --canvas: #f7f7f7; /* page off-white (réf) */
+  --ink: #131515; /* fond des cartes sombres */
+  --primary-700: #cc3d00; /* hover / pressed */
+  --gold: #ffb020; /* jaune/or — streak, signal, highlights */
+
+  /* Channel colors — reprises des lignes de tâches colorées de la réf.
+     Teintes pleines ; le composant calcule les variantes claires/sombres. */
+  --email-dot: #ff4c00; /* orange */
+  --email-text: #b8360a;
+  --email-bg: #fff0e9;
+  --linkedin-dot: #3d7bff; /* bleu */
+  --linkedin-text: #1b46b8;
+  --linkedin-bg: #e9f0ff;
+  --postal-dot: #9b5cff; /* violet */
+  --postal-text: #6b28cc;
+  --postal-bg: #f2ebff;
+
+  /* Lifecycle states (orthogonaux au canal) */
+  --state-signal: #ffb020; /* signal déclenché — anneau or qui pulse */
+  --state-sent: #12a70a; /* envoyé — vert de la réf */
+
   /* ombres ambiantes douces (style v0) */
-  --shadow-sm: 0 1px 2px 0 rgb(9 9 11 / 0.05);
-  --shadow: 0 1px 3px 0 rgb(9 9 11 / 0.07), 0 1px 2px -1px rgb(9 9 11 / 0.05);
+  --shadow-sm: 0 1px 2px 0 rgb(19 21 21 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(19 21 21 / 0.07), 0 1px 2px -1px rgb(19 21 21 / 0.05);
+  --shadow-lift: 0 18px 40px -12px rgb(19 21 21 / 0.22), 0 6px 14px -6px rgb(19 21 21 / 0.12);
+  --glow-brand: 0 24px 70px -18px rgb(255 76 0 / 0.4);
+  --gradient-hero: linear-gradient(150deg, #ff6a2b 0%, #ff4c00 42%, #7a1f00 100%);
+
+  /* Motion — Remotion-portable (voir DESIGN.md) */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.5, 1);
+  --ease-io-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-instant: 120ms;
+  --dur-fast: 200ms;
+  --dur-base: 320ms;
+  --dur-slow: 560ms;
+  --dur-cine: 800ms;
 }
 
 @theme inline {
@@ -51,8 +87,9 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans-brand);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono-brand);
 }
 
 * {
@@ -60,10 +97,15 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--canvas); /* page off-white, comme la réf */
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  letter-spacing: -0.02em;
 }
 
 /* Entrée douce — remplace la couche GSAP par du CSS pur.
@@ -86,6 +128,52 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .animate-in {
+    animation: none;
+  }
+}
+
+/* Signal fired — anneau ambré qui pulse (grille de rétroplanning). */
+@keyframes signal-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(245 158 11 / 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgb(245 158 11 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(245 158 11 / 0);
+  }
+}
+
+.signal-pulse {
+  animation: signal-pulse 2s var(--ease-io-soft) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signal-pulse {
+    animation: none;
+  }
+}
+
+/* Chip qui glisse dans une cellule — réutilise --i pour la cascade. */
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.chip-in {
+  animation: chip-in var(--dur-base) var(--ease-spring) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip-in {
     animation: none;
   }
 }

@@ -45,7 +45,7 @@ export function LeadSheet({
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <SheetTitle>{fullName(data.lead)}</SheetTitle>
+                  <SheetTitle className="font-display">{fullName(data.lead)}</SheetTitle>
                   <SheetDescription>
                     {data.lead.position} · {data.company?.name}
                   </SheetDescription>

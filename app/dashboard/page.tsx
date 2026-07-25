@@ -16,11 +16,14 @@ function Stat({
   icon: React.ComponentType<{ className?: string }>;
 }) {
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-[var(--shadow-sm)]">
+    <div className="rounded-2xl border bg-card p-4 shadow-[var(--shadow-sm)] transition-shadow hover:shadow-[var(--shadow)]">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Icon className="h-3.5 w-3.5" /> {label}
+        <span className="flex size-6 items-center justify-center rounded-lg bg-[var(--accent)]" style={{ color: "var(--primary)" }}>
+          <Icon className="h-3.5 w-3.5" />
+        </span>
+        {label}
       </div>
-      <div className="mt-2 text-2xl font-semibold tracking-tight">{value}</div>
+      <div className="font-display mt-2 text-2xl font-bold tracking-tight">{value}</div>
     </div>
   );
 }
@@ -38,7 +41,7 @@ export default async function HomePage() {
       />
 
       {empty ? (
-        <div className="rounded-xl border bg-card py-16 text-center text-sm text-muted-foreground shadow-[var(--shadow-sm)]">
+        <div className="rounded-2xl border bg-card py-16 text-center text-sm text-muted-foreground shadow-[var(--shadow-sm)]">
           Nothing to show yet. Load{" "}
           <Link href="/dashboard/settings" className="text-primary underline">
             demo data
@@ -59,9 +62,9 @@ export default async function HomePage() {
             <Stat label="Contacts found" value={stats.contactsFound} icon={CheckCircle2} />
           </div>
 
-          <div className="rounded-xl border bg-card p-5 shadow-[var(--shadow-sm)]">
-            <div className="mb-4 flex items-center gap-2 text-sm font-medium">
-              <Radio className="h-4 w-4 text-primary" /> Signals by type
+          <div className="rounded-2xl border bg-card p-5 shadow-[var(--shadow-sm)]">
+            <div className="mb-4 flex items-center gap-2 text-sm font-semibold">
+              <Radio className="h-4 w-4" style={{ color: "var(--primary)" }} /> Signals by type
             </div>
             <div className="space-y-2.5">
               {stats.signalsByType.map((s) => {
@@ -75,8 +78,8 @@ export default async function HomePage() {
                     </div>
                     <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-muted">
                       <div
-                        className="h-full rounded-full bg-primary/70"
-                        style={{ width: `${(s.count / maxSignal) * 100}%` }}
+                        className="h-full rounded-full"
+                        style={{ width: `${(s.count / maxSignal) * 100}%`, background: "var(--gradient-hero)" }}
                       />
                     </div>
                     <div className="w-6 shrink-0 text-right text-sm tabular-nums">{s.count}</div>

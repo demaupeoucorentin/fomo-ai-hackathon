@@ -52,7 +52,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
   return (
     <div className="flex h-[calc(100vh-8.5rem)] gap-4">
       {/* Left rail — leads */}
-      <div className="flex w-80 shrink-0 flex-col rounded-xl border">
+      <div className="flex w-80 shrink-0 flex-col overflow-hidden rounded-2xl border bg-card shadow-[var(--shadow-sm)]">
         <div className="space-y-2 border-b p-3">
           <Input
             placeholder="Search a lead…"
@@ -96,11 +96,14 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
               key={i.lead.id}
               onClick={() => setSelected(i.lead.id)}
               className={cn(
-                "flex w-full items-start gap-3 border-b px-3 py-3 text-left transition-colors last:border-0 hover:bg-accent/40",
+                "relative flex w-full items-start gap-3 border-b px-3 py-3 text-left transition-colors last:border-0 hover:bg-accent/40",
                 selected === i.lead.id && "bg-accent",
               )}
             >
-              <Avatar className="h-9 w-9">
+              {selected === i.lead.id && (
+                <span className="absolute left-0 top-1/2 h-8 w-0.5 -translate-y-1/2 rounded-full bg-primary" />
+              )}
+              <Avatar className="h-9 w-9 ring-2 ring-black/5">
                 <AvatarImage src={i.lead.avatarUrl ?? undefined} alt="" />
                 <AvatarFallback>{initials(i)}</AvatarFallback>
               </Avatar>
@@ -134,7 +137,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
       </div>
 
       {/* Right pane — planning */}
-      <div className="min-w-0 flex-1 overflow-y-auto rounded-xl border p-6">
+      <div className="min-w-0 flex-1 overflow-y-auto rounded-2xl border bg-card p-6 shadow-[var(--shadow-sm)]">
         {!selected && (
           <p className="text-sm text-muted-foreground">Select a lead on the left.</p>
         )}
@@ -142,7 +145,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
         {selected && data && (
           <div className="max-w-2xl space-y-6">
             <div className="flex items-center gap-4">
-              <Avatar className="h-12 w-12">
+              <Avatar className="h-12 w-12 ring-2 ring-black/5">
                 <AvatarImage src={data.lead.avatarUrl ?? undefined} alt="" />
                 <AvatarFallback>
                   {data.lead.firstName[0]}
@@ -150,7 +153,7 @@ export function PlanningCockpit({ leads }: { leads: PlanningLeadItem[] }) {
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <h2 className="text-xl font-semibold tracking-tight">{fullName(data.lead)}</h2>
+                <h2 className="font-display text-xl font-semibold tracking-tight">{fullName(data.lead)}</h2>
                 <p className="text-sm text-muted-foreground">
                   {data.lead.position} · {data.company?.name}
                 </p>

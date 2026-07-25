@@ -34,7 +34,7 @@ export function GenerateStep({ onDone }: { onDone: () => void }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+        <h1 className="font-display flex items-center gap-2 text-3xl font-bold tracking-tight">
           <Sparkles className="h-6 w-6 text-primary" />
           Generating sequences…
         </h1>

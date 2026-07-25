@@ -10,7 +10,7 @@ import {
   useReactTable,
   type SortingState,
 } from "@tanstack/react-table";
-import { LayoutDashboard, Mail, Phone } from "lucide-react";
+import { LayoutDashboard, Mail, Phone, CheckCircle2 } from "lucide-react";
 import type { LeadListItem } from "@/core/use-cases/dto";
 import { fullName } from "@/core/domain/entities";
 import { useLeads } from "@/lib/query/hooks";
@@ -126,10 +126,13 @@ export function LeadsStep({ runId }: { runId: string }) {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Ready to launch
+          </div>
+          <h1 className="font-display text-3xl font-bold tracking-tight">
             {data?.leads.length ?? 0} leads detected
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1.5 text-sm text-muted-foreground">
             Your comparator sequence is ready. Click a lead to view its timeline.
           </p>
         </div>
@@ -149,7 +152,7 @@ export function LeadsStep({ runId }: { runId: string }) {
             className="max-w-xs"
           />
 
-          <div className="overflow-x-auto rounded-xl border">
+          <div className="overflow-x-auto rounded-2xl border bg-card shadow-[var(--shadow-sm)]">
             <table className="w-full text-sm">
           <thead className="border-b bg-muted/40">
             {table.getHeaderGroups().map((hg) => (

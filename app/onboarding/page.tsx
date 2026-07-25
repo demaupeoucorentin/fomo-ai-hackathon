@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Zap } from "lucide-react";
 import type { AccountInput } from "@/core/ports/driven";
 import { useStartRun } from "@/lib/query/hooks";
 import { cn } from "@/lib/utils";
@@ -38,25 +38,43 @@ export default function OnboardingPage() {
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-6 py-10">
-      <header className="mb-10">
-        <div className="flex items-center gap-2 text-sm font-semibold tracking-tight">
-          <span className="inline-block h-2.5 w-2.5 rounded-full bg-primary" /> {BRAND}
+      <header className="mb-12">
+        <div className="flex items-center gap-2.5 text-sm font-semibold tracking-tight">
+          <span
+            className="inline-flex h-7 w-7 items-center justify-center rounded-xl text-primary-foreground shadow-[var(--shadow-sm)]"
+            style={{ background: "var(--gradient-hero)" }}
+          >
+            <Zap className="h-3.5 w-3.5" />
+          </span>
+          <span className="font-display text-base font-bold tracking-tight">{BRAND}</span>
         </div>
-        <nav className="mt-6 flex items-center gap-2">
+        <nav className="mt-7 flex flex-wrap items-center gap-2">
           {STEPS.map((s, i) => (
             <div key={s.key} className="flex items-center gap-2">
               <div
                 className={cn(
-                  "flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-                  i < stepIndex && "border-primary/20 bg-accent text-accent-foreground",
-                  i === stepIndex && "border-primary bg-primary text-primary-foreground",
-                  i > stepIndex && "text-muted-foreground",
+                  "flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-colors",
+                  i < stepIndex && "border-primary/25 bg-accent text-accent-foreground",
+                  i === stepIndex &&
+                    "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-sm)]",
+                  i > stepIndex && "border-border text-muted-foreground",
                 )}
               >
-                {i < stepIndex ? <Check className="h-3 w-3" /> : <span>{i + 1}</span>}
+                {i < stepIndex ? (
+                  <Check className="h-3 w-3" />
+                ) : (
+                  <span className="tabular-nums">{i + 1}</span>
+                )}
                 {s.label}
               </div>
-              {i < STEPS.length - 1 && <div className="h-px w-6 bg-border" />}
+              {i < STEPS.length - 1 && (
+                <div
+                  className={cn(
+                    "h-0.5 w-6 rounded-full transition-colors",
+                    i < stepIndex ? "bg-primary/40" : "bg-border",
+                  )}
+                />
+              )}
             </div>
           ))}
         </nav>
