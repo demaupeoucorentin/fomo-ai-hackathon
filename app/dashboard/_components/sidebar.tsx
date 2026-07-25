@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarClock, Settings, Ghost } from "lucide-react";
+import { LayoutDashboard, CalendarClock, Settings, Flame } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BRAND } from "@/lib/brand";
 
@@ -17,12 +17,12 @@ export function Sidebar() {
     <aside className="flex w-60 shrink-0 flex-col gap-1 border-r bg-[var(--sidebar)] p-4">
       <Link
         href="/onboarding"
-        className="mb-5 flex items-center gap-2.5 px-2 py-1 text-sm font-semibold tracking-tight"
+        className="mb-5 flex items-center gap-2.5 px-2 py-1 text-sm"
       >
-        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-[var(--shadow-sm)]">
-          <Ghost className="h-3.5 w-3.5" />
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg text-white shadow-[var(--shadow-sm)]" style={{ background: "var(--gradient-hero)" }}>
+          <Flame className="h-4 w-4" />
         </span>
-        {BRAND}
+        <span className="font-display text-[15px] font-bold tracking-tight">{BRAND}</span>
       </Link>
       {NAV.map((n) => {
         const active = n.href === "/dashboard" ? path === n.href : path.startsWith(n.href);

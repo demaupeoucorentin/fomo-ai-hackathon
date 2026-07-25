@@ -44,3 +44,7 @@ next-env.d.ts
 sqlite.db
 sqlite.db-*
 .env.local
+
+# storybook
+/storybook-static
+.gstack/

@@ -43,8 +43,11 @@ export function ImportStep({
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-28">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Import your accounts</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
+          <FileSpreadsheet className="h-3.5 w-3.5" /> Step 2 · Import
+        </div>
+        <h1 className="font-display text-3xl font-bold tracking-tight">Import your accounts</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
           Drop the list of companies you want to target.
         </p>
       </div>
@@ -78,11 +81,17 @@ export function ImportStep({
           source === "csv" && "border-emerald-300 bg-emerald-50/40",
         )}
       >
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+        <span
+          className={cn(
+            "flex h-14 w-14 items-center justify-center rounded-2xl shadow-[var(--shadow-sm)] transition-colors",
+            source === "csv" ? "bg-emerald-100 text-emerald-600" : "text-primary-foreground",
+          )}
+          style={source === "csv" ? undefined : { background: "var(--gradient-hero)" }}
+        >
           <Upload className="h-6 w-6" />
         </span>
         <div>
-          <div className="font-medium">Drop your companies file</div>
+          <div className="font-display text-base font-semibold">Drop your companies file</div>
           <div className="mt-0.5 text-sm text-muted-foreground">
             CSV or Excel — drag it here or click to choose
           </div>
@@ -118,13 +127,16 @@ export function ImportStep({
       {accounts.length > 0 && (
         <Card>
           <CardContent className="p-4">
-            <div className="mb-3 flex items-center gap-2 text-sm font-medium">
+            <div className="font-display mb-3 flex items-center gap-2 text-sm font-semibold">
               <FileSpreadsheet className="h-4 w-4 text-primary" />
               {accounts.length} accounts ready
             </div>
             <div className="flex flex-wrap gap-2">
               {accounts.slice(0, 12).map((a, i) => (
-                <span key={i} className="rounded-md border bg-muted/50 px-2.5 py-1 text-xs">
+                <span
+                  key={i}
+                  className="rounded-full border bg-muted/50 px-2.5 py-1 text-xs font-medium"
+                >
                   {a.name ?? a.domain}
                 </span>
               ))}

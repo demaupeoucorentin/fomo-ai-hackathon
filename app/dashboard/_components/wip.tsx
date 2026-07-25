@@ -15,12 +15,12 @@ export function EmptyState({
   action?: { label: string; href: string };
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-xl border bg-card py-20 text-center shadow-[var(--shadow-sm)]">
-      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border bg-card py-20 text-center shadow-[var(--shadow-sm)]">
+      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--accent)]" style={{ color: "var(--primary)" }}>
         <Icon className="h-5 w-5" />
       </span>
       <div className="space-y-1">
-        <p className="font-medium">{title}</p>
+        <p className="font-display font-semibold">{title}</p>
         {description && (
           <p className="mx-auto max-w-sm text-sm text-muted-foreground">{description}</p>
         )}

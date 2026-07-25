@@ -24,11 +24,17 @@ const TIMEOUT_MS = 90_000;
 
 function Stat({ icon: Icon, label, value }: { icon: typeof Users; label: string; value: number }) {
   return (
-    <div className="animate-in rounded-lg border bg-card p-4 shadow-[var(--shadow-sm)]">
+    <div className="animate-in rounded-2xl border bg-card p-4 shadow-[var(--shadow-sm)] transition-shadow hover:shadow-[var(--shadow)]">
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <Icon className="h-3.5 w-3.5" /> {label}
+        <span
+          className="flex size-6 items-center justify-center rounded-lg bg-[var(--accent)]"
+          style={{ color: "var(--primary)" }}
+        >
+          <Icon className="h-3.5 w-3.5" />
+        </span>
+        {label}
       </div>
-      <div className="mt-1 text-2xl font-semibold tabular-nums">{value}</div>
+      <div className="font-display mt-2 text-2xl font-bold tabular-nums">{value}</div>
     </div>
   );
 }
@@ -73,7 +79,7 @@ export function RunningStep({ runId, onDone }: { runId: string; onDone: () => vo
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+        <h1 className="font-display flex items-center gap-2 text-3xl font-bold tracking-tight">
           {failed ? (
             <AlertCircle className="h-6 w-6 text-rose-600" />
           ) : done ? (

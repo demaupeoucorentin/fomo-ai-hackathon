@@ -21,7 +21,7 @@ function IcpSkeleton() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
+        <CardTitle className="font-display flex items-center gap-2 text-base">
           <Loader2 className="h-4 w-4 animate-spin text-primary" /> Preparing your ideal customer…
         </CardTitle>
         <CardDescription>We read your site and infer your ideal customer profile.</CardDescription>
@@ -64,8 +64,11 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-28">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Define your ideal customer</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">
+          <Sparkles className="h-3.5 w-3.5" /> Step 1 · Your ICP
+        </div>
+        <h1 className="font-display text-3xl font-bold tracking-tight">Define your ideal customer</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
           Paste your website address, the AI infers your ideal customer profile.
         </p>
       </div>
@@ -94,7 +97,7 @@ export function IcpStep({ onNext }: { onNext: () => void }) {
       {persona && (
         <Card>
           <CardHeader>
-            <CardTitle>Your ideal customer</CardTitle>
+            <CardTitle className="font-display text-lg">Your ideal customer</CardTitle>
             <CardDescription>Adjust if needed — each field is a comma-separated list.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

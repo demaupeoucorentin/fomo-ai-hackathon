@@ -64,11 +64,11 @@ export function LeadTimeline({ data }: { data: LeadDetailView }) {
     <ol className="relative ml-2 border-l pl-6">
       {items.map((it) => (
         <li key={`${it.kind}-${it.id}`} className="mb-6 last:mb-0">
-          <span className="absolute -left-[9px] flex h-4 w-4 items-center justify-center rounded-full border bg-background">
+          <span className="absolute -left-[9px] flex h-4 w-4 items-center justify-center rounded-full border bg-background shadow-[var(--shadow-sm)]">
             {it.kind === "signal" ? (
-              <Radio className="h-2.5 w-2.5 text-primary" />
+              <Radio className="h-2.5 w-2.5" style={{ color: "var(--gold)" }} />
             ) : (
-              <Mail className="h-2.5 w-2.5 text-muted-foreground" />
+              <Mail className="h-2.5 w-2.5" style={{ color: "var(--primary)" }} />
             )}
           </span>
 
@@ -104,7 +104,7 @@ export function LeadTimeline({ data }: { data: LeadDetailView }) {
                     "flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[11px]",
                     it.status === "sent"
                       ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                      : "border-blue-200 bg-blue-50 text-blue-700",
+                      : "border-amber-200 bg-amber-50 text-amber-700",
                   )}
                 >
                   {it.status === "sent" ? (

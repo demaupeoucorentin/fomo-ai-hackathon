@@ -45,9 +45,9 @@ export function SequencePreview({ leads }: { leads: LeadListItem[] }) {
   }));
 
   return (
-    <div>
+    <div className="rounded-2xl border bg-card p-5 shadow-[var(--shadow-sm)]">
       <div className="mb-3">
-        <h2 className="text-sm font-semibold tracking-tight">Email sequence</h2>
+        <h2 className="font-display text-sm font-semibold tracking-tight">Email sequence</h2>
         <p className="text-xs text-muted-foreground">
           3 touches · {audience} recipient{audience > 1 ? "s" : ""}
         </p>
