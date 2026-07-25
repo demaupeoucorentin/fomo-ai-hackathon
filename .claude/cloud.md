@@ -68,10 +68,10 @@ CRM sync → lead → signal detected → retro-planned cadence → drafted emai
   - **Planning cockpit** (money screen): `app/dashboard/planning/_components/{planning-cockpit,lead-timeline}.tsx`.
   - Onboarding: `app/onboarding/**`. Emails (multi-channel outbox), CRM, Sequences, Settings, Usage, Pricing under `app/dashboard/**`. Leads list + CRM use the shared `Wip`/`EmptyState`.
   - Gold-standard patterns: `app/dashboard/page.tsx` (stat tiles) + planning cockpit.
-- **Reusable demo/Remotion components** in `components/showcase/`: `retro-planning-grid.tsx` (teammates×dates hero, light), `channels-detail.tsx` (Email/LinkedIn-via-lemlist/Postal previews), `hubspot-chrome.tsx` (fake CRM frame). Not wired into the app; kept for the Remotion demo.
-- **Landing SVGs** — `public/landing-mockups/*.svg` (warm-streak, unlock-badge, daily-plan, touches-phone, retro-planning-grid, channel-{email,linkedin,letter}). High-DPI PNG-in-SVG, drop-in replacements for the Framer landing's placeholder graphics.
-- **`.claude/v0-prompt.md`** — paste-ready v0.dev prompt. Real assets: portraits in `public/people/`, Ramp logo in `public/companies/`.
-- Motion tokens are **Remotion-portable** (same cubic-beziers + ms) so the demo animates identically to the app.
+- **`.claude/v0-prompt.md`** — paste-ready v0.dev prompt (design reference).
+- The Remotion demo project lives in **`my-video/`** (standalone; its own deps + deploy).
+
+> Production-clean: the mockup/exploration artifacts were removed once the landing SVGs were handed off — `components/showcase/`, `public/landing-mockups/`, and the demo assets (`public/people/`, `public/companies/`) no longer exist. Regenerate from git history (`git show a32ec2b`, `7694e02`) if ever needed.
 
 ## Specialist agent briefs
 
